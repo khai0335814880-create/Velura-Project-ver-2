@@ -1,6 +1,6 @@
 # UC-A01 Production Readiness
 
-Verified on 2026-07-01 against Supabase project `drvkrpoojyncodfytftn` using read-only publishable-key requests.
+Verified on 2026-07-01 against Supabase project `gtyuajboeffmfskofoyh` using read-only publishable-key requests.
 
 ## Implemented
 

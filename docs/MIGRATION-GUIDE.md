@@ -11,7 +11,7 @@
 
 ### Bước 1: Áp Migration
 
-1. Vào **Supabase Dashboard** → project `drvkrpoojyncodfytftn`
+1. Vào **Supabase Dashboard** → project `gtyuajboeffmfskofoyh`
 2. Vào **SQL Editor**
 3. Copy TOÀN BỘ nội dung file `database/migrations/001_uc_a01_account_rbac.sql`
 4. Paste vào SQL Editor và nhấn **Run**

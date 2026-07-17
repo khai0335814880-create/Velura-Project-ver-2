@@ -1,6 +1,6 @@
 import fs from "fs";
 
-const SUPABASE_URL = "https://drvkrpoojyncodfytftn.supabase.co";
+const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
 
 let SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 if (!SERVICE_KEY) {

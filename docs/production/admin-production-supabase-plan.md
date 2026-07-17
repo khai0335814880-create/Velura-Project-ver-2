@@ -73,7 +73,7 @@ flowchart LR
 | --- | --- | --- | --- | --- |
 | Local | feature branches | local Supabase or dedicated dev project | Generated fixtures | Developer machine |
 | Staging | `develop` | Separate staging project | Sanitized deterministic fixtures | Automatic after CI |
-| Production | `main`/release tag | `drvkrpoojyncodfytftn` | Real data | Manual GitHub Environment approval |
+| Production | `main`/release tag | `gtyuajboeffmfskofoyh` | Real data | Manual GitHub Environment approval |
 
 Never use the production project for automated mutation tests. Staging IDs and secrets must differ from production.
 

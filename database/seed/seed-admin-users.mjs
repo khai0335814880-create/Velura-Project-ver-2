@@ -6,8 +6,8 @@
  * It uses the Supabase REST API with the service role key.
  */
 
-const SUPABASE_URL = "https://drvkrpoojyncodfytftn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_6ELMfwBsM3SFAXQz8-jmOQ_kv1kkGh7";
+const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm";
 
 // Read service role key from env or .env file
 let SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";

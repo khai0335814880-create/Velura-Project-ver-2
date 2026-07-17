@@ -5,7 +5,7 @@
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-auth.js";
 
-const STORAGE_KEY = "sb-drvkrpoojyncodfytftn-auth-token";
+const STORAGE_KEY = "sb-gtyuajboeffmfskofoyh-auth-token";
 
 let cachedClient = null;
 

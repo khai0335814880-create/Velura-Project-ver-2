@@ -5,8 +5,8 @@ const child = spawn(process.execPath, ["apps/api/src/server.js"], {
   env: {
     ...process.env,
     PORT: port,
-    VELURA_SUPABASE_URL: process.env.VELURA_SUPABASE_URL || "https://drvkrpoojyncodfytftn.supabase.co",
-    VELURA_SUPABASE_ANON_KEY: process.env.VELURA_SUPABASE_ANON_KEY || "sb_publishable_6ELMfwBsM3SFAXQz8-jmOQ_kv1kkGh7"
+    VELURA_SUPABASE_URL: process.env.VELURA_SUPABASE_URL || "https://gtyuajboeffmfskofoyh.supabase.co",
+    VELURA_SUPABASE_ANON_KEY: process.env.VELURA_SUPABASE_ANON_KEY || "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm"
   },
   stdio: ["ignore", "pipe", "pipe"]
 });

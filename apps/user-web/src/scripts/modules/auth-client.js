@@ -758,8 +758,8 @@ export function updateHeaderAuthUI() {
 
 // ─── Social OAuth (Google / Facebook via Supabase Auth) ─────────────────────
 
-const SUPABASE_URL = "https://drvkrpoojyncodfytftn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_6ELMfwBsM3SFAXQz8-jmOQ_kv1kkGh7";
+const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm";
 const SUPABASE_AUTH = SUPABASE_URL + "/auth/v1";
 const PKCE_KEY = "velura-oauth-pkce-code-verifier";
 const CALLBACK_URL = window.location.origin + "/src/pages/auth/auth-callback.html";

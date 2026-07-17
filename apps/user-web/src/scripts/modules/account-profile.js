@@ -158,7 +158,7 @@ function initAccountTabs() {
 /**
  * Profile form verification and submission
  */
-const SOCIAL_SUPABASE_AUTH = "https://drvkrpoojyncodfytftn.supabase.co/auth/v1";
+const SOCIAL_SUPABASE_AUTH = "https://gtyuajboeffmfskofoyh.supabase.co/auth/v1";
 const SOCIAL_PKCE_KEY = "velura-oauth-pkce-code-verifier";
 const SOCIAL_CALLBACK_URL = window.location.origin + "/src/pages/auth/auth-callback.html";
 
