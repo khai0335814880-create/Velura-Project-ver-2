@@ -200,12 +200,21 @@ body {
   height: 44px;
   flex: 0 0 44px;
   place-items: center;
+  overflow: hidden;
   border: 1px solid rgba(201, 123, 99, 0.22);
   border-radius: 14px;
   background: #f7e8e0;
   color: var(--welcome-accent);
   font-size: 0.82rem;
   font-weight: 800;
+}
+
+.member-profile__avatar > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
 }
 
 .member-profile__copy {

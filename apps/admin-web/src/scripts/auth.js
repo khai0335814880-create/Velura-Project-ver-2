@@ -29,6 +29,38 @@ function getCurrentPage() {
   return file;
 }
 
+function avatarFallback(session) {
+  var name = String(session?.name || "Admin").trim();
+  return name.split(/\s+/).filter(Boolean).map(function(part) {
+    return part.charAt(0);
+  }).join("").slice(0, 2).toUpperCase() || "AD";
+}
+
+function renderProfileAvatar(element, session) {
+  if (!element) return;
+
+  var fallback = avatarFallback(session);
+  var avatar = String(session?.avatar || "").trim();
+  element.replaceChildren();
+
+  try {
+    var url = new URL(avatar);
+    if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("Unsupported avatar URL");
+
+    var image = document.createElement("img");
+    image.src = url.href;
+    image.alt = "";
+    image.referrerPolicy = "no-referrer";
+    image.addEventListener("error", function() {
+      element.replaceChildren();
+      element.textContent = fallback;
+    }, { once: true });
+    element.appendChild(image);
+  } catch {
+    element.textContent = avatar && avatar.length <= 4 ? avatar : fallback;
+  }
+}
+
 async function checkAuth() {
   var token = getAccessToken();
   if (!token) { window.location.replace("./login.html"); return null; }
@@ -96,7 +128,7 @@ function updateSidebarForRole(session) {
   var roleEl = document.querySelector(".admin-profile__copy small");
   if (roleEl) roleEl.textContent = session.role;
   var avatarEl = document.querySelector(".admin-profile__avatar");
-  if (avatarEl) avatarEl.textContent = session.avatar || session.name.slice(0, 2).toUpperCase();
+  renderProfileAvatar(avatarEl, session);
 
   // Add logout
   if (!document.querySelector("[data-admin-logout]")) {
@@ -112,4 +144,4 @@ function updateSidebarForRole(session) {
   }
 }
 
-export { checkAuth, logout, updateSidebarForRole, getCurrentPage, getSession, ROLE_PAGES };
+export { checkAuth, logout, updateSidebarForRole, getCurrentPage, getSession, renderProfileAvatar, ROLE_PAGES };

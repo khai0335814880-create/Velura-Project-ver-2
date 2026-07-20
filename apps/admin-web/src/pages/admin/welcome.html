@@ -212,7 +212,7 @@
   </main>
 
   <script type="module">
-    import { checkAuth, logout } from "../../scripts/auth.js";
+    import { checkAuth, logout, renderProfileAvatar } from "../../scripts/auth.js";
 
     const text = (id, value) => {
       const node = document.getElementById(id);
@@ -230,7 +230,7 @@
 
       text("user-name", session.name);
       text("user-role", session.role || "Member");
-      text("user-avatar", session.avatar || session.name.slice(0, 2).toUpperCase());
+      renderProfileAvatar(document.getElementById("user-avatar"), session);
       text("ticket-name", session.name);
       text("ticket-email", session.email || "Chưa có email");
       text("ticket-role", session.role || "Member");
