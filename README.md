@@ -100,7 +100,7 @@ Velura-project/
 
 ## 🚀 Hướng dẫn Cài đặt & Chạy Local (Cho Giảng viên & Hội đồng chấm)
 
-Dự án này đã được cấu hình sẵn các khóa API Demo hoạt động tốt (bao gồm Supabase, Gemini AI, Mistral AI và SMTP Gmail). Dưới đây là các bước chi tiết để tái lập và khởi chạy dự án:
+Dự án sử dụng biến môi trường cho Supabase, AI, SMTP và các dịch vụ bên ngoài. File `.env.example` chỉ chứa cấu trúc và giá trị mẫu; người chạy dự án phải tự cung cấp thông tin hợp lệ trong file `.env` local hoặc trên dashboard của nền tảng deploy.
 
 ### 1. Yêu cầu hệ thống
 - **Node.js** phiên bản `>= 22` (Khuyến nghị sử dụng Node.js 22 LTS).
@@ -111,8 +111,8 @@ Dự án này đã được cấu hình sẵn các khóa API Demo hoạt động
 
 #### Bước 1: Clone dự án và truy cập thư mục
 ```bash
-git clone https://github.com/Royal2005-coder/Velura-project.git
-cd Velura-project
+git clone https://github.com/khai0335814880-create/Velura-Project-ver-2.git
+cd Velura-Project-ver-2
 ```
 
 #### Bước 2: Cài đặt toàn bộ thư viện (Dependencies)
@@ -121,7 +121,7 @@ npm install
 ```
 
 #### Bước 3: Cấu hình biến môi trường (`.env`)
-Chúng tôi đã điền sẵn toàn bộ cấu hình, khóa API (Gemini, Mistral, Supabase, SMTP) chuẩn vào file `.env.example`. Bạn chỉ cần sao chép sang file `.env` bằng lệnh sau:
+Sao chép file cấu hình mẫu thành `.env`, sau đó thay các placeholder bằng thông tin của môi trường bạn được cấp. Không commit hoặc chia sẻ file `.env`.
 
 * **Trên Windows (cmd / PowerShell):**
   ```powershell
@@ -133,7 +133,7 @@ Chúng tôi đã điền sẵn toàn bộ cấu hình, khóa API (Gemini, Mistra
   ```
 
 > [!NOTE]
-> File `.env` chứa các biến môi trường thực thi đã được tích hợp đầy đủ. Không cần sửa đổi gì thêm để chạy ở chế độ **development** (cổng mặc định `8787` cho API, `3001` cho User Shop và `5174` cho Admin Panel).
+> File `.env.example` không chứa secret thật. Trước khi chạy, cần cấu hình tối thiểu Supabase URL, publishable key, service-role key cho API và các biến dịch vụ được sử dụng. Các cổng development mặc định là `8787` cho API, `3001` cho User Shop và `5174` cho Admin Panel.
 
 #### Bước 4: Thiết lập và Khởi tạo Cơ sở dữ liệu (Database Setup)
 Chạy các lệnh sau theo thứ tự để đồng bộ schema cơ sở dữ liệu và dữ liệu mẫu (admin, blogs...):
@@ -214,12 +214,11 @@ Sau khi chạy lệnh `npm run db:seed:admins`, cơ sở dữ liệu sẽ đư�
 
 ## 🌐 Deployment (Production)
 
-Dự án đã được triển khai thực tế tại:
+Mã nguồn chính thức của phiên bản này được lưu tại:
 
-| Service | URL |
-|---------|-----|
-| 🛍️ Trang khách hàng | [https://velura.royalai.dev](https://velura.royalai.dev) |
-| ⚙️ Trang quản trị | [https://admin.royalai.dev](https://admin.royalai.dev) |
+- [khai0335814880-create/Velura-Project-ver-2](https://github.com/khai0335814880-create/Velura-Project-ver-2)
+
+Domain production sẽ được cập nhật sau khi hoàn tất triển khai User Web, Admin Web và API. Xem [README_DEPLOY.md](./README_DEPLOY.md) để biết đầy đủ lệnh build, biến môi trường, Supabase Auth Redirect URL và checklist kiểm tra sau deploy.
 
 ---
 
