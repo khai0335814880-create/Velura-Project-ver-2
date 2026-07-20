@@ -7,6 +7,7 @@ import {
 } from "./auth-session.js";
 import { syncFavoriteOutfitsOnLogin } from "./chatbot.js";
 import { isValidPhone } from "../utils/phone-validator.js";
+import { supabaseConfig } from "../supabase-config.js";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -758,8 +759,8 @@ export function updateHeaderAuthUI() {
 
 // ─── Social OAuth (Google / Facebook via Supabase Auth) ─────────────────────
 
-const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm";
+const SUPABASE_URL = supabaseConfig.url;
+const SUPABASE_ANON_KEY = supabaseConfig.anonKey;
 const SUPABASE_AUTH = SUPABASE_URL + "/auth/v1";
 const PKCE_KEY = "velura-oauth-pkce-code-verifier";
 const CALLBACK_URL = window.location.origin + "/src/pages/auth/auth-callback.html";

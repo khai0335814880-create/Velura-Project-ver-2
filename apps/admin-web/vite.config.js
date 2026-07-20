@@ -1,9 +1,17 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import { resolve } from "path";
 import fs from "node:fs";
 
-export default defineConfig({
+const envDirectory = resolve(__dirname, "../..");
+
+export default defineConfig(({ mode }) => {
+  const env = { ...process.env, ...loadEnv(mode, envDirectory, "") };
+  const serverPort = Number(env.ADMIN_WEB_PORT || 5174);
+  const proxyTarget = env.API_PROXY_TARGET || `http://${env.DEV_HOST || "localhost"}:${env.PORT || 8787}`;
+
+  return {
   root: "src",
+  envDir: envDirectory,
   publicDir: "../public",
   build: {
     outDir: "../dist",
@@ -28,7 +36,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5174,
+    port: serverPort,
     host: true,
     ...(fs.existsSync(resolve(__dirname, "../../certs/key.pem")) ? {
       https: {
@@ -38,16 +46,17 @@ export default defineConfig({
     } : {}),
     proxy: {
       "/api": {
-        target: "http://localhost:8787",
+        target: proxyTarget,
         changeOrigin: true,
         secure: false
       },
       "/uploads": {
-        target: "http://localhost:8787",
+        target: proxyTarget,
         changeOrigin: true,
         secure: false
       }
     },
     open: "/pages/admin/login.html"
   }
+  };
 });

@@ -24,10 +24,12 @@
   </main>
 
   <script type="module">
-    const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm";
+    import { CONFIG } from "../../scripts/config.js";
+
+    const SUPABASE_URL = CONFIG.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = CONFIG.SUPABASE_ANON_KEY;
     const SUPABASE_AUTH = SUPABASE_URL + "/auth/v1";
-    const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:8787" : window.location.origin;
+    const API_BASE = CONFIG.API_BASE_URL;
     const PKCE_KEY = "velura-oauth-pkce-code-verifier";
     const REDIRECT_URI = window.location.origin + "/src/pages/auth/auth-callback.html";
 

@@ -9,14 +9,15 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { SCRIPT_CONFIG } from './config.mjs';
 
 const { Client } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const dbUrl = process.env.SUPABASE_DB_URL;
+const dbUrl = SCRIPT_CONFIG.SUPABASE_DB_URL;
 if (!dbUrl) {
   console.error('❌ Missing SUPABASE_DB_URL in .env file.');
-  console.error('   Example: postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres');
+  console.error('   Example: postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.example:5432/postgres');
   process.exit(1);
 }
 
@@ -50,7 +51,7 @@ const MIGRATIONS = [
   '017_create_return_evidence_bucket.sql',
   '018_admin_dashboard_summary.sql',
   '020_user_social_accounts.sql',
-  '021_ensure_user_social_accounts_schema_cache.sql',
+  '20260717090000_ensure_user_social_accounts_schema_cache.sql',
 ];
 
 async function main() {

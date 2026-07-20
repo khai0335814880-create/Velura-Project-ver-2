@@ -1,10 +1,6 @@
-const API_BASE_URL = String(
-  window.VELURA_CONFIG?.apiBaseUrl ||
-  localStorage.getItem("velura_api_base_url") ||
-  (window.location.port && window.location.port !== "8787"
-    ? window.location.protocol + "//" + window.location.hostname + ":8787"
-    : window.location.origin)
-).replace(/\/+$/, "");
+import { CONFIG } from "./config.js";
+
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 class ApiError extends Error {
   constructor(status, code, message, details) {

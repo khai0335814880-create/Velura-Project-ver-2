@@ -262,6 +262,6 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(config.port, () => {
-  console.log(`Velura API listening on http://localhost:${config.port}`);
+  console.log(`Velura API listening on ${config.apiOrigin}`);
 });
 // Trigger watch restart.

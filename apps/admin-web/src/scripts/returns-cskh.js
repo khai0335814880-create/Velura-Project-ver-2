@@ -1,7 +1,8 @@
 import { returnApi } from "./return-api.js";
 import { productApi } from "./product-api.js";
+import { CONFIG } from "./config.js";
 
-const API_BASE = "http://127.0.0.1:8787";
+const API_BASE = CONFIG.API_BASE_URL;
 
 const state = { 
   returns: [], 
@@ -40,11 +41,7 @@ function getEvidenceImageUrl(img) {
   if (img.startsWith("http://") || img.startsWith("https://")) {
     return img;
   }
-  const apiHost = window.location.hostname;
-  const apiBase = (apiHost === "localhost" || apiHost === "127.0.0.1")
-    ? `http://${apiHost}:8787`
-    : window.location.origin;
-  return apiBase + (img.startsWith("/") ? img : "/" + img);
+  return API_BASE + (img.startsWith("/") ? img : "/" + img);
 }
 
 function icon(name) { return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeServiceHtml(name)}"></use></svg>`; }

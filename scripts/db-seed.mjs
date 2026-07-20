@@ -1,8 +1,9 @@
 import pg from 'pg';
+import { SCRIPT_CONFIG } from './config.mjs';
 
 const { Client } = pg;
 
-const dbUrl = process.env.SUPABASE_DB_URL;
+const dbUrl = SCRIPT_CONFIG.SUPABASE_DB_URL;
 if (!dbUrl) {
   console.error('❌ Missing SUPABASE_DB_URL in .env file.');
   process.exit(1);

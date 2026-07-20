@@ -1,4 +1,5 @@
 import { insertRow } from "./supabase.js";
+import { config } from "./config.js";
 
 export async function writeAuditLog(context, entry) {
   const actor = context.profile || {};
@@ -23,7 +24,7 @@ export async function writeAuditLog(context, entry) {
   try {
     await insertRow("audit_logs", payload);
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
+    if (config.nodeEnv !== "production") {
       console.warn("[audit] failed to write audit log", error.message);
     }
   }

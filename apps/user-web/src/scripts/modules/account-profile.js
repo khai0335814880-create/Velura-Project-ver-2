@@ -7,6 +7,7 @@ import { getCurrentRole, hasRealAuthSession } from "./auth-session.js";
 import { locationData } from "./location-data.js";
 import { createSearchDropdown } from "./search-dropdown.js";
 import { isValidPhone } from "../utils/phone-validator.js";
+import { supabaseConfig } from "../supabase-config.js";
 
 
 
@@ -158,7 +159,7 @@ function initAccountTabs() {
 /**
  * Profile form verification and submission
  */
-const SOCIAL_SUPABASE_AUTH = "https://gtyuajboeffmfskofoyh.supabase.co/auth/v1";
+const SOCIAL_SUPABASE_AUTH = supabaseConfig.url + "/auth/v1";
 const SOCIAL_PKCE_KEY = "velura-oauth-pkce-code-verifier";
 const SOCIAL_CALLBACK_URL = window.location.origin + "/src/pages/auth/auth-callback.html";
 

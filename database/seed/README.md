@@ -6,6 +6,7 @@ Required safeguards:
 
 - Target must be development or staging.
 - `VELURA_ALLOW_SEED=1` must be set explicitly.
+- `VITE_SUPABASE_URL` must identify the target project.
 - `VELURA_SUPABASE_SERVICE_ROLE_KEY` must come from a secret store.
 - `VELURA_SEED_PASSWORD` must contain at least 16 characters.
 - Never run account seed scripts against production.

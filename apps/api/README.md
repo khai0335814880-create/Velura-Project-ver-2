@@ -15,7 +15,7 @@ npm run api:dev
 Healthcheck:
 
 ```text
-GET http://localhost:8787/health
+GET <API_ORIGIN>/health
 ```
 
 The API deliberately has no extra runtime dependencies yet. It uses Node 20 `fetch` and Supabase REST/Auth endpoints.

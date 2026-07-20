@@ -1,14 +1,11 @@
-import fs from "fs";
+import { SCRIPT_CONFIG } from "../../scripts/config.mjs";
 
-const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
+const SUPABASE_URL = SCRIPT_CONFIG.SUPABASE_URL;
+const SERVICE_KEY = SCRIPT_CONFIG.SUPABASE_SERVICE_ROLE_KEY;
 
-let SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-if (!SERVICE_KEY) {
-  try {
-    const env = fs.readFileSync(new URL("../../.env", import.meta.url), "utf8");
-    const match = env.match(/VELURA_SUPABASE_SERVICE_ROLE_KEY=(.*)/);
-    if (match) SERVICE_KEY = match[1].trim();
-  } catch {}
+if (!SUPABASE_URL) {
+  console.error("Error: VITE_SUPABASE_URL not found in the environment!");
+  process.exit(1);
 }
 
 if (!SERVICE_KEY) {

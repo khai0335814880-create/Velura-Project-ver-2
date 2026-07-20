@@ -1,11 +1,9 @@
-const SUPABASE_URL = window.VELURA_CONFIG?.supabaseUrl || "https://gtyuajboeffmfskofoyh.supabase.co";
-const SUPABASE_ANON_KEY = window.VELURA_CONFIG?.supabaseAnonKey || "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm";
-const API_BASE_URL = String(
-  window.VELURA_CONFIG?.apiBaseUrl ||
-  (window.location.port && window.location.port !== "8787"
-    ? window.location.protocol + "//" + window.location.hostname + ":8787"
-    : window.location.origin)
-).replace(/\/+$/, "");
+import { supabaseConfig } from "./supabase-config.js";
+import { CONFIG } from "./config.js";
+
+const SUPABASE_URL = supabaseConfig.url;
+const SUPABASE_ANON_KEY = supabaseConfig.anonKey;
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 const TOKEN_KEY = "velura_supabase_access_token";
 const SESSION_KEY = "velura_current_session";

@@ -1,4 +1,5 @@
 import { apiRequest } from "./api.js";
+import { CONFIG } from "../config.js";
 import { showToast } from "./account-profile.js";
 
 export function initProductReview() {
@@ -399,10 +400,7 @@ export function initProductReview() {
       const headers = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const apiBase = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-        ? "http://localhost:8787"
-        : window.location.origin;
-      const response = await fetch(`${apiBase}/api/user/upload/evidence`, {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/upload/evidence`, {
         method: "POST",
         headers,
         body: formData

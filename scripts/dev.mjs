@@ -5,6 +5,7 @@
  */
 import { spawn } from 'node:child_process';
 import { platform } from 'node:os';
+import { SCRIPT_CONFIG } from './config.mjs';
 
 const isWindows = platform() === 'win32';
 const npmCmd = isWindows ? 'npm.cmd' : 'npm';
@@ -21,9 +22,9 @@ console.log('');
 console.log('╔═══════════════════════════════════════════════╗');
 console.log('║     🛍️  Velura Fashion Shop — Dev Server      ║');
 console.log('╠═══════════════════════════════════════════════╣');
-console.log('║  API Server   →  http://localhost:8787        ║');
-console.log('║  Admin Panel  →  http://localhost:5174        ║');
-console.log('║  User Shop    →  http://localhost:3001        ║');
+console.log(`║  API Server   →  ${SCRIPT_CONFIG.API_ORIGIN}`);
+console.log(`║  Admin Panel  →  ${SCRIPT_CONFIG.ADMIN_WEB_ORIGIN}`);
+console.log(`║  User Shop    →  ${SCRIPT_CONFIG.USER_WEB_ORIGIN}`);
 console.log('╚═══════════════════════════════════════════════╝');
 console.log('');
 

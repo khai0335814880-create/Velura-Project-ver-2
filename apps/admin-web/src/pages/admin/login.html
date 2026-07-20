@@ -61,13 +61,12 @@
       SUPABASE_URL,
       SUPABASE_ANON_KEY
     } from '../../scripts/supabase-auth.js';
+    import { getSupabaseClient } from '../../scripts/supabase-client.js';
 
     var PKCE_STORAGE_KEY = 'velura-oauth-pkce-code-verifier';
     var SUPABASE_AUTH = SUPABASE_URL + '/auth/v1';
 
-    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { flowType: 'pkce', persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: window.localStorage }
-    });
+    var sb = getSupabaseClient();
 
     var errorEl = document.getElementById("login-error");
     var successEl = document.getElementById("login-success");

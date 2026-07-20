@@ -3,9 +3,10 @@
 // page read the SAME storage backend with the SAME storageKey, which is
 // required for the PKCE code verifier to survive the redirect.
 
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-auth.js";
+import { supabaseConfig } from "./supabase-config.js";
 
-const STORAGE_KEY = "sb-gtyuajboeffmfskofoyh-auth-token";
+const projectRef = new URL(supabaseConfig.url).hostname.split(".")[0];
+const STORAGE_KEY = `sb-${projectRef}-auth-token`;
 
 let cachedClient = null;
 
@@ -14,7 +15,7 @@ export function getSupabaseClient({ detectSessionInUrl = false } = {}) {
   if (!window.supabase?.createClient) {
     throw new Error("Supabase JS UMD bundle is not loaded yet");
   }
-  cachedClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  cachedClient = window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey, {
     auth: {
       flowType: "pkce",
       detectSessionInUrl,

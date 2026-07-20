@@ -1,3 +1,5 @@
+import { config } from "./config.js";
+
 export class HttpError extends Error {
   constructor(status, code, message, details) {
     super(message);
@@ -75,7 +77,7 @@ export function applyCors(req, res, corsOrigin) {
   const wildcard = configured.includes("*");
   let allowOrigin = wildcard ? requestOrigin || "*" : configured.includes(requestOrigin) ? requestOrigin : "";
 
-  if (!allowOrigin && requestOrigin && process.env.NODE_ENV !== "production") {
+  if (!allowOrigin && requestOrigin && config.nodeEnv !== "production") {
     try {
       const originUrl = new URL(requestOrigin);
       if (

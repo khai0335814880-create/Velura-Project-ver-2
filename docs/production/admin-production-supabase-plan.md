@@ -82,8 +82,8 @@ Never use the production project for automated mutation tests. Staging IDs and s
 ### Browser variables
 
 ```text
-VELURA_SUPABASE_URL
-VELURA_SUPABASE_ANON_KEY       # sb_publishable_*, safe for browser
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY         # sb_publishable_*, safe for browser
 VELURA_API_BASE_URL
 ```
 
@@ -92,8 +92,8 @@ The browser sends the publishable key to Supabase Auth and sends the signed user
 ### API and worker secrets
 
 ```text
-VELURA_SUPABASE_URL
-VELURA_SUPABASE_ANON_KEY
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
 VELURA_SUPABASE_SERVICE_ROLE_KEY   # sb_secret_*, backend only
 EMAIL_WEBHOOK_URL
 EMAIL_WEBHOOK_TOKEN

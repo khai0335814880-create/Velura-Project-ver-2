@@ -6,21 +6,21 @@
  * It uses the Supabase REST API with the service role key.
  */
 
-const SUPABASE_URL = "https://gtyuajboeffmfskofoyh.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_boQ_U1tSUZLbI7_0-NQvcg_3s_TEjfm";
+import { SCRIPT_CONFIG } from "../../scripts/config.mjs";
 
-// Read service role key from env or .env file
-let SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-if (!SERVICE_KEY) {
-  try {
-    const fs = await import("fs");
-    const env = fs.readFileSync(new URL("../../.env", import.meta.url), "utf8");
-    const match = env.match(/VELURA_SUPABASE_SERVICE_ROLE_KEY=(.*)/);
-    if (match) SERVICE_KEY = match[1].trim();
-  } catch {}
+const SUPABASE_URL = SCRIPT_CONFIG.SUPABASE_URL;
+const SERVICE_KEY = SCRIPT_CONFIG.SUPABASE_SERVICE_ROLE_KEY;
+const KEY = SERVICE_KEY;
+
+if (!SUPABASE_URL) {
+  console.error("Error: VITE_SUPABASE_URL not found in the environment!");
+  process.exit(1);
 }
 
-const KEY = SERVICE_KEY || SUPABASE_ANON_KEY;
+if (!SERVICE_KEY) {
+  console.error("Error: Supabase Service Role Key not found in the environment!");
+  process.exit(1);
+}
 
 const ADMIN_USERS = [
   {

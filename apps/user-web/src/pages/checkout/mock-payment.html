@@ -182,7 +182,9 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { CONFIG } from "../../scripts/config.js";
+
     // Extract query parameters
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order_id');
@@ -201,9 +203,7 @@
       badge.className = 'gateway-badge gateway-badge--vnpay';
     }
 
-    const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      ? 'http://localhost:8787'
-      : window.location.origin;
+    const apiBase = CONFIG.API_BASE_URL;
 
     async function submitCallback(status) {
       if (!orderId) {

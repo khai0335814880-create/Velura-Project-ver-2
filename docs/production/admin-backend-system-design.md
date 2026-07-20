@@ -51,8 +51,8 @@ Trách nhiệm chính:
 Browser chỉ dùng publishable key và API base URL.
 
 ```text
-VELURA_SUPABASE_URL
-VELURA_SUPABASE_ANON_KEY
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
 VELURA_API_BASE_URL
 ```
 
@@ -68,8 +68,8 @@ Luồng:
 Backend dùng publishable key để verify user token và service key cho tác vụ backend được kiểm soát.
 
 ```text
-VELURA_SUPABASE_URL
-VELURA_SUPABASE_ANON_KEY
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
 VELURA_SUPABASE_SERVICE_ROLE_KEY
 CORS_ORIGIN
 EMAIL_WEBHOOK_URL

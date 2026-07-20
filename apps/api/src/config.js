@@ -1,9 +1,13 @@
+const apiPort = Number(process.env.PORT || 8787);
+const devHost = process.env.DEV_HOST || "localhost";
+
 export const config = {
   nodeEnv: process.env.NODE_ENV || "development",
-  port: Number(process.env.PORT || 8787),
+  port: apiPort,
+  apiOrigin: stripTrailingSlash(process.env.API_ORIGIN || `http://${devHost}:${apiPort}`),
   corsOrigins: parseCsv(process.env.CORS_ORIGIN || "http://localhost:5173"),
-  supabaseUrl: stripTrailingSlash(process.env.VELURA_SUPABASE_URL || ""),
-  supabaseAnonKey: process.env.VELURA_SUPABASE_ANON_KEY || "",
+  supabaseUrl: stripTrailingSlash(process.env.VITE_SUPABASE_URL || ""),
+  supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || "",
   supabaseServiceRoleKey: process.env.VELURA_SUPABASE_SERVICE_ROLE_KEY || "",
   requestTimeoutMs: Number(process.env.API_REQUEST_TIMEOUT_MS || 15000),
   maxBodyBytes: Number(process.env.API_MAX_BODY_BYTES || 15728640),
@@ -36,8 +40,8 @@ export const config = {
 
 export function assertRuntimeConfig() {
   const missing = [];
-  if (!config.supabaseUrl) missing.push("VELURA_SUPABASE_URL");
-  if (!config.supabaseAnonKey) missing.push("VELURA_SUPABASE_ANON_KEY");
+  if (!config.supabaseUrl) missing.push("VITE_SUPABASE_URL");
+  if (!config.supabaseAnonKey) missing.push("VITE_SUPABASE_ANON_KEY");
   if (missing.length) {
     throw new Error(`Missing required API environment: ${missing.join(", ")}`);
   }

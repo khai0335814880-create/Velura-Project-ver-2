@@ -12,8 +12,8 @@
 
 Do not commit real secrets. Configure these in GitHub environments or the target cloud platform:
 
-- `VELURA_SUPABASE_URL`
-- `VELURA_SUPABASE_ANON_KEY`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 - `VELURA_SUPABASE_SERVICE_ROLE_KEY`
 - `STAGING_DEPLOY_HOOK` or cloud-specific deploy credentials
 

@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-exec('npx vite --host --port 5174', { cwd: __dirname + '/../admin-web' }, (err, stdout, stderr) => {
+exec('npm run dev -w apps/admin-web', { cwd: __dirname + '/..' }, (err, stdout, stderr) => {
   if (stdout) console.log(stdout);
   if (stderr) console.error(stderr);
 });
