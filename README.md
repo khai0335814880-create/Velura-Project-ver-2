@@ -243,9 +243,9 @@ npm run build
 |-------|--------|
 | `npm start` | Khởi động tất cả (API + Admin + User) |
 | `npm run dev` | Tương tự `npm start` |
-| `npm run dev:api` | Chỉ chạy API server |
+| `npm run dev:api` | Chạy API server; tự bỏ qua nếu API Velura đã chạy |
 | `npm run dev:admin` | Chỉ chạy Admin web |
-| `npm run dev:user` | Chỉ chạy User web |
+| `npm run dev:user` | Chạy User web và tự khởi động API nếu cần |
 | `npm run build` | Build production cả User + Admin |
 | `npm test` | Chạy 116 unit tests |
 | `npm run db:migrate` | Chạy database migrations |

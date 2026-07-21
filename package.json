@@ -11,9 +11,11 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env scripts/dev.mjs",
     "dev": "node --env-file-if-exists=.env scripts/dev.mjs",
-    "dev:api": "node --env-file=.env --watch apps/api/src/server.js",
+    "dev:api": "node --env-file-if-exists=.env scripts/dev-api.mjs",
+    "dev:api:watch": "node --env-file=.env --watch apps/api/src/server.js",
     "dev:admin": "npm run dev -w apps/admin-web",
-    "dev:user": "npm run dev -w apps/user-web",
+    "dev:user": "node --env-file-if-exists=.env scripts/dev-user.mjs",
+    "dev:user:web": "npm run dev -w apps/user-web",
     "check:config": "node scripts/check-config.mjs",
     "prebuild": "npm run check:config",
     "build": "npm run build:user && npm run build:admin",

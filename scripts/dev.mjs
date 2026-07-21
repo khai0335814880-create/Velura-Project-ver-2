@@ -13,7 +13,7 @@ const npmCmd = isWindows ? 'npm.cmd' : 'npm';
 const services = [
   { name: 'API',   cmd: npmCmd, args: ['run', 'dev:api'],   color: '\x1b[36m' },   // Cyan
   { name: 'Admin', cmd: npmCmd, args: ['run', 'dev:admin'],  color: '\x1b[35m' },   // Magenta
-  { name: 'User',  cmd: npmCmd, args: ['run', 'dev:user'],   color: '\x1b[32m' },   // Green
+  { name: 'User',  cmd: npmCmd, args: ['run', 'dev:user:web'], color: '\x1b[32m' }, // Green
 ];
 
 const reset = '\x1b[0m';
