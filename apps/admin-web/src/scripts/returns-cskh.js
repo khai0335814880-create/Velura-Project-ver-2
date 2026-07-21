@@ -2,6 +2,7 @@ import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { returnApi } from "./return-api.js";
 import { productApi } from "./product-api.js";
 import { CONFIG } from "./config.js";
+import { computeServiceKpis } from "./service-kpis.js";
 
 const API_BASE = CONFIG.API_BASE_URL;
 
@@ -185,7 +186,7 @@ function renderReturns(rows = state.returns) {
 
 function renderTickets(rows = state.tickets) {
   const query = (document.querySelector("[data-table-search='support']")?.value || "").toLowerCase();
-  const typeFilter = document.querySelector("#ticket-type-filter")?.value || "";
+  const statusFilter = document.querySelector("#ticket-status-filter")?.value || "";
   const priorityFilter = document.querySelector("#ticket-priority-filter")?.value || "";
 
   const filtered = rows.filter((row) => {
@@ -193,7 +194,7 @@ function renderTickets(rows = state.tickets) {
       const matchString = JSON.stringify(row).toLowerCase();
       if (!matchString.includes(query)) return false;
     }
-    if (typeFilter && row.title !== typeFilter) {
+    if (statusFilter && row.status !== statusFilter) {
       return false;
     }
     if (priorityFilter && row.priority !== priorityFilter) {
@@ -677,40 +678,23 @@ async function submitAction(form) {
 
 function updateKpis() {
   const kpis = document.querySelectorAll(".admin-kpi-card__value");
+  const summary = computeServiceKpis({ returns: state.returns, tickets: state.tickets });
   if (kpis.length >= 4) {
-    const pendingReturns = state.returns.filter(r => {
-      if (r.status !== "pending") return false;
-      const ageInHours = (new Date() - new Date(r.created_at)) / (60 * 60 * 1000);
-      return ageInHours <= 48;
-    }).length;
-    const pendingTickets = state.tickets.filter(t => !["resolved", "closed"].includes(t.status)).length;
-    
-    // Priority high: return pending + high priority open tickets
-    const highPriority = state.tickets.filter(t => t.priority === "high" && !["resolved", "closed"].includes(t.status)).length + pendingReturns;
-    
-    // Completed today: completed returns + resolved/closed tickets
-    const todayStr = new Date().toISOString().split("T")[0];
-    const completedToday = state.returns.filter(r => ["completed", "resolved"].includes(r.status)).length;
-
-    kpis[0].textContent = String(pendingReturns);
-    kpis[1].textContent = String(pendingTickets);
-    kpis[2].textContent = String(highPriority);
-    kpis[3].textContent = String(completedToday || 0);
+    kpis[0].textContent = String(summary.returnsInProgress);
+    kpis[1].textContent = String(summary.ticketsInProgress);
+    kpis[2].textContent = String(summary.highPriorityTickets);
+    kpis[3].textContent = String(summary.completedToday);
   }
 
   // Also update tab badges
   const returnsTabBadge = document.querySelector('[data-zone="returns"] span');
   if (returnsTabBadge) {
-    returnsTabBadge.textContent = String(state.returns.filter(r => {
-      if (r.status !== "pending") return false;
-      const ageInHours = (new Date() - new Date(r.created_at)) / (60 * 60 * 1000);
-      return ageInHours <= 48;
-    }).length);
+    returnsTabBadge.textContent = String(summary.returnsInProgress);
   }
 
   const supportTabBadge = document.querySelector('[data-zone="support"] span');
   if (supportTabBadge) {
-    supportTabBadge.textContent = String(state.tickets.filter(t => !["resolved", "closed"].includes(t.status)).length);
+    supportTabBadge.textContent = String(summary.ticketsInProgress);
   }
 }
 
@@ -1183,8 +1167,8 @@ document.addEventListener("click", (event) => {
     if (type === "support" || !type) {
       const input = document.querySelector("[data-table-search='support']");
       if (input) input.value = "";
-      const typeSel = document.querySelector("#ticket-type-filter");
-      if (typeSel) typeSel.value = "";
+      const statusSel = document.querySelector("#ticket-status-filter");
+      if (statusSel) statusSel.value = "";
       const prioritySel = document.querySelector("#ticket-priority-filter");
       if (prioritySel) prioritySel.value = "";
       state.ticketsPage = 1;
@@ -1244,7 +1228,7 @@ document.querySelectorAll("#return-type-filter, #return-status-filter").forEach(
   renderReturns();
 }));
 
-document.querySelectorAll("#ticket-type-filter, #ticket-priority-filter").forEach((sel) => sel.addEventListener("change", () => {
+document.querySelectorAll("#ticket-status-filter, #ticket-priority-filter").forEach((sel) => sel.addEventListener("change", () => {
   state.ticketsPage = 1;
   renderTickets();
 }));

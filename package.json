@@ -22,7 +22,7 @@
     "preview:user": "npm run preview -w apps/user-web",
     "preview:admin": "npm run preview -w apps/admin-web",
     "test": "npm run test:api",
-    "test:api": "node --test tests/api/account-service.test.js tests/api/account-router.test.js tests/api/product-service.test.js tests/api/product-router.test.js tests/api/order-service.test.js tests/api/order-router.test.js tests/api/review-service.test.js tests/api/return-service.test.js tests/api/pricing-service.test.js tests/api/security.test.js tests/api/frontend-auth-security.test.js tests/api/dashboard.test.js tests/api/chatbot-recovery.test.js tests/api/chatbot-service.test.js tests/api/recommendation-service.test.js tests/api/quiz.test.js",
+    "test:api": "node --test tests/api/account-service.test.js tests/api/account-router.test.js tests/api/product-service.test.js tests/api/product-router.test.js tests/api/order-service.test.js tests/api/order-router.test.js tests/api/review-service.test.js tests/api/return-service.test.js tests/api/pricing-service.test.js tests/api/security.test.js tests/api/frontend-auth-security.test.js tests/api/dashboard.test.js tests/api/chatbot-recovery.test.js tests/api/chatbot-service.test.js tests/api/recommendation-service.test.js tests/api/quiz.test.js tests/api/service-kpis.test.js",
     "test:db-write": "node --env-file=.env scripts/test-db-write.mjs",
     "smoke:api": "node --env-file=.env scripts/smoke-api.mjs",
     "db:migrate": "node --env-file=.env scripts/apply-migrations.mjs",
