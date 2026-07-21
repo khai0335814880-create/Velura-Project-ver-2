@@ -245,7 +245,8 @@ test("customer member and guest flows require real auth sessions", async () => {
   assert.match(product, /\/src\/pages\/auth\/signup\.html/);
 
   assert.match(rbac, /import \{ verifyJwt \} from "\.\/auth-helper\.js"/);
-  assert.match(rbac, /const decoded = verifyJwt\(token\)/);
+  assert.match(rbac, /const decodeVeluraToken = dependencies\.verifyJwt \|\| verifyJwt/);
+  assert.match(rbac, /const decoded = decodeVeluraToken\(token\)/);
   assert.match(rbac, /authUser:\s*\{\s*id:\s*profile\.user_id/);
 });
 

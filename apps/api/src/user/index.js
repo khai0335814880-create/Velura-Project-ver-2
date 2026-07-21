@@ -12,15 +12,24 @@ import { handleNotificationsRoute } from "./notifications.js";
 import { handleUploadRoute } from "./upload.js";
 import { handleOffersRoute } from "./offers.js";
 
+const PUBLIC_USER_ROUTES = new Set(["products", "categories"]);
+
+export function shouldRejectInvalidSession(subRoute, authHeader, context) {
+  if (subRoute === "auth" || PUBLIC_USER_ROUTES.has(subRoute)) return false;
+  return Boolean(
+    authHeader
+    && /^Bearer\s+(.+)$/i.test(authHeader)
+    && (!context.authUser || !context.profile)
+  );
+}
+
 export async function handleUserRoute(req, res, parts, corsHeaders, context) {
   const subRoute = parts[2]; // e.g. "auth", "profile", "addresses", "style-quiz", "wishlist", "orders", "reviews", "returns", "cart", "categories", "vouchers"
   const action = parts[3];   // e.g. "signup", "signin", or order ID, etc.
 
-  if (subRoute !== "auth") {
-    const authHeader = req.headers.authorization || "";
-    if (authHeader && /^Bearer\s+(.+)$/i.test(authHeader) && (!context.authUser || !context.profile)) {
-      throw new HttpError(401, "UNAUTHORIZED", "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
-    }
+  const authHeader = req.headers.authorization || "";
+  if (shouldRejectInvalidSession(subRoute, authHeader, context)) {
+    throw new HttpError(401, "UNAUTHORIZED", "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
   }
 
   switch (subRoute) {

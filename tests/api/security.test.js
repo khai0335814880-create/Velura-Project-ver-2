@@ -4,6 +4,8 @@ import { Readable } from "node:stream";
 import { ACCOUNT_SELECT } from "../../apps/api/src/accounts/account-constants.js";
 import { applySecurityHeaders, readJson } from "../../apps/api/src/http.js";
 import { createFixedWindowLimiter } from "../../apps/api/src/rate-limit.js";
+import { buildAuthContext } from "../../apps/api/src/rbac.js";
+import { shouldRejectInvalidSession } from "../../apps/api/src/user/index.js";
 import { readFile } from "node:fs/promises";
 
 test("account projection excludes credentials and OTP fields", () => {
@@ -35,6 +37,70 @@ test("mutation limiter blocks requests beyond the fixed window", () => {
   assert.equal(limiter.consume("actor", 200).allowed, true);
   assert.equal(limiter.consume("actor", 300).allowed, false);
   assert.equal(limiter.consume("actor", 1200).allowed, true);
+});
+
+test("fresh Velura JWT resolves its profile through the trusted server path", async () => {
+  const calls = [];
+  const profile = {
+    user_id: "11111111-1111-4111-8111-111111111111",
+    email: "member@example.com",
+    role: "member",
+    is_active: true
+  };
+  const context = await buildAuthContext(
+    { headers: { authorization: "Bearer fresh-velura-token" } },
+    {
+      getAuthUser: async () => null,
+      verifyJwt: () => ({ user_id: profile.user_id, email: profile.email, role: "member" }),
+      selectOne: async (table, query, options) => {
+        calls.push({ table, query, options });
+        return profile;
+      }
+    }
+  );
+
+  assert.equal(context.authUser.id, profile.user_id);
+  assert.equal(context.profile, profile);
+  assert.equal(context.roleCode, "member");
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].options, { useAnonKey: false });
+});
+
+test("Supabase access token is forwarded while resolving its own profile", async () => {
+  const calls = [];
+  const profile = {
+    user_id: "22222222-2222-4222-8222-222222222222",
+    auth_user_id: "33333333-3333-4333-8333-333333333333",
+    email: "social@example.com",
+    role: "member",
+    is_active: true
+  };
+  const context = await buildAuthContext(
+    { headers: { authorization: "Bearer supabase-access-token" } },
+    {
+      getAuthUser: async () => ({ id: profile.auth_user_id, email: profile.email }),
+      verifyJwt: () => null,
+      selectOne: async (table, query, options) => {
+        calls.push({ table, query, options });
+        return profile;
+      }
+    }
+  );
+
+  assert.equal(context.profile, profile);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].options, {
+    useAnonKey: true,
+    accessToken: "supabase-access-token"
+  });
+});
+
+test("public catalog remains readable when an optional token is invalid", () => {
+  const guestContext = { authUser: null, profile: null };
+  assert.equal(shouldRejectInvalidSession("products", "Bearer stale-token", guestContext), false);
+  assert.equal(shouldRejectInvalidSession("categories", "Bearer stale-token", guestContext), false);
+  assert.equal(shouldRejectInvalidSession("profile", "Bearer stale-token", guestContext), true);
+  assert.equal(shouldRejectInvalidSession("cart", "", guestContext), false);
 });
 
 test("legacy generic admin mutation API is disabled", async () => {

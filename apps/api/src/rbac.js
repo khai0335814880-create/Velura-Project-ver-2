@@ -26,7 +26,10 @@ export const roleModules = {
   guest: []
 };
 
-export async function buildAuthContext(req) {
+export async function buildAuthContext(req, dependencies = {}) {
+  const authenticateSupabaseUser = dependencies.getAuthUser || getAuthUser;
+  const decodeVeluraToken = dependencies.verifyJwt || verifyJwt;
+  const findProfile = dependencies.selectOne || selectOne;
   const token = getToken(req);
   if (!token) return buildGuestContext();
 
@@ -35,25 +38,30 @@ export async function buildAuthContext(req) {
     "role", "admin_role", "is_active", "is_verified", "created_at",
     "last_login_at", "version", "updated_at", "saved_addresses"
   ].join(",");
-  const dbOptions = { useAnonKey: true }; // Use anon key fallback for token validation too
+  const callerOptions = { useAnonKey: true, accessToken: token };
+  const trustedOptions = { useAnonKey: false };
 
   // Try Supabase Auth first
   let authUser = null;
   try {
-    authUser = await getAuthUser(token);
+    authUser = await authenticateSupabaseUser(token);
   } catch (err) {
     // Ignore error and fall back to local custom JWT
   }
 
-  const decoded = verifyJwt(token);
+  const decoded = decodeVeluraToken(token);
 
   if (decoded && !authUser?.id) {
     let profile = null;
     try {
-      profile = await selectOne("users", {
+      // A Velura JWT is signed and verified by this API, not by Supabase Auth.
+      // After verification, resolve its profile with the trusted server key;
+      // sending this token through the anonymous RLS path cannot establish
+      // auth.uid() and incorrectly turns a fresh login into a guest session.
+      profile = await findProfile("users", {
         select: accountSelect,
         user_id: `eq.${decoded.user_id}`
-      }, dbOptions);
+      }, trustedOptions);
     } catch {
       profile = null;
     }
@@ -76,15 +84,19 @@ export async function buildAuthContext(req) {
 
   let profile = null;
   try {
-    profile = await selectOne("users", {
+    // Supabase access tokens must be forwarded so RLS can evaluate auth.uid().
+    profile = await findProfile("users", {
       select: accountSelect,
       auth_user_id: `eq.${authUser.id}`
-    }, dbOptions);
+    }, callerOptions);
     if (!profile) {
-      profile = await selectOne("users", {
+      // Older linked accounts may not have auth_user_id populated yet. The
+      // Supabase token has already been verified, so a server-side lookup by
+      // its verified email is safe for this identity bootstrap step.
+      profile = await findProfile("users", {
         select: accountSelect,
         email: `eq.${authUser.email}`
-      }, dbOptions);
+      }, trustedOptions);
     }
   } catch {
     profile = null;
