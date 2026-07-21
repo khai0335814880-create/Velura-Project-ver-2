@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { orderApi } from "./order-api.js";
 
 const state = { orders: [], count: 0, active: "all", selected: null, logs: [], currentPage: 1, itemsPerPage: 10, logsPage: 1 };
@@ -26,7 +27,7 @@ function escapeHtml(value) {
 }
 
 function icon(name) {
-  return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeHtml(name)}" /></svg>`;
+  return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapeHtml(name)}" /></svg>`;
 }
 
 function money(value) {

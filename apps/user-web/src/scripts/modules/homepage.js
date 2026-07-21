@@ -2,6 +2,7 @@ import { apiRequest } from "./api.js";
 import { showToast } from "./account-profile.js";
 import { addToCart, getVariantImage } from "./cart.js";
 import { updateWishlistBadge } from "./wishlist.js";
+import { CATEGORY_IMAGE_MAP } from "./category-images.js";
 
 /**
  * ES6 Module: Homepage Controller
@@ -260,15 +261,7 @@ export function initHomepage() {
       `
     };
 
-    const categoryImageMap = {
-      ao: "/src/assets/images/category-icons/icon-ao.png",
-      quan: "/src/assets/images/category-icons/icon-quan.png",
-      "dam-vay": "/src/assets/images/category-icons/icon-dam-vay.png",
-      "ao-khoac": "/src/assets/images/category-icons/icon-ao-khoac.png",
-      "set-do": "/src/assets/images/category-icons/icon-set-do.png",
-      "phu-kien": "/src/assets/images/category-icons/icon-phu-kien.png",
-      "giay-dep": "/src/assets/images/category-icons/icon-giay-dep.png"
-    };
+    const categoryImageMap = CATEGORY_IMAGE_MAP;
 
     categoriesGrid.innerHTML = categories.map(c => {
       const iconHtml = iconMap[c.slug] || `

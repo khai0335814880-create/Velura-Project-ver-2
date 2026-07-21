@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { productApi } from "./product-api.js";
 
 (function () {
@@ -47,7 +48,7 @@ import { productApi } from "./product-api.js";
   }
 
   function icon(name) {
-    return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeHtml(name)}" /></svg>`;
+    return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapeHtml(name)}" /></svg>`;
   }
 
   function statusLabel(status) {

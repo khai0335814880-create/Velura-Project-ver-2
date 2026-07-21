@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
 
 (function () {
@@ -25,7 +26,7 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
   if (toInput) toInput.value = todayForInput.toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
 
   function icon(name) {
-    return '<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#' + name + '"></use></svg>';
+    return '<svg class="admin-line-icon"><use href="' + adminIconsUrl + '#' + name + '"></use></svg>';
   }
 
   function showToast(message) {

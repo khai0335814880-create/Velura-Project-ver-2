@@ -1,3 +1,9 @@
+import bannerA1 from "../../assets/images/banners/hot-banner-a1-birthday.png";
+import bannerA4 from "../../assets/images/banners/hot-banner-a4-loyal.png";
+import bannerA5 from "../../assets/images/banners/hot-banner-a5-friend.png";
+import bannerA6 from "../../assets/images/banners/hot-banner-a6-freeship.png";
+import fallbackImage from "../../assets/images/placeholder.jpg";
+
 import { apiRequest, isSessionValid } from "./api.js";
 
 const OFFER_IDS_WITH_MODAL = new Set(["A1", "A4", "A5", "A6"]);
@@ -103,7 +109,7 @@ function openBirthdayGuestModal() {
   openInfoModal({
     title: "Tháng sinh nhật của bạn, Velura có quà nhỏ",
     eyebrow: "Ưu đãi cá nhân",
-    image: "/src/assets/images/banners/hot-banner-a1-birthday.png",
+    image: bannerA1,
     body: `
       <p>Velura không bắt bạn nhập ngày sinh ngay khi tạo tài khoản. Bạn có thể xem ưu đãi trước, sau đó đăng nhập để lưu ngày sinh và kích hoạt quà riêng.</p>
       ${renderBenefitCard({
@@ -309,7 +315,7 @@ function openBirthdayActiveModal(profile) {
   openInfoModal({
     title: "Velura đã ghi nhớ sinh nhật của bạn",
     eyebrow: "Ưu đãi đã sẵn sàng",
-    image: "/src/assets/images/banners/hot-banner-a1-birthday.png",
+    image: bannerA1,
     body: `
       <p>Chúc mừng sinh nhật, ${escapeHtml(name)}! Ưu đãi dành riêng cho tháng này đã sẵn sàng.</p>
       <div class="monthly-offer-voucher">
@@ -351,7 +357,7 @@ async function openLoyaltyFlow() {
     openInfoModal({
       title: "Mua nhiều, nhận nhiều hơn",
       eyebrow: "Khách hàng thân thiết",
-      image: "/src/assets/images/banners/hot-banner-a4-loyal.png",
+      image: bannerA4,
       body: `
         <p>Quyền lợi thân thiết được tính theo tổng chi tiêu tích lũy của tài khoản, không yêu cầu đăng ký chương trình riêng.</p>
         ${renderTierList([
@@ -377,7 +383,7 @@ async function openLoyaltyFlow() {
   openInfoModal({
     title: `Xin chào, ${profile?.full_name || "bạn"}`,
     eyebrow: "Tiến trình thân thiết",
-    image: "/src/assets/images/banners/hot-banner-a4-loyal.png",
+    image: bannerA4,
     body: `
       <p>Velura đang ghi nhận quyền lợi thành viên dựa trên tổng chi tiêu tích lũy của tài khoản.</p>
       <div class="monthly-offer-progress">
@@ -405,7 +411,7 @@ async function openReferralFlow() {
     openInfoModal({
       title: "Rủ bạn bè, cả hai đều có quà",
       eyebrow: "Chia sẻ Velura",
-      image: "/src/assets/images/banners/hot-banner-a5-friend.png",
+      image: bannerA5,
       body: `
         <p>Bạn có thể xem điều kiện trước. Khi muốn tạo link giới thiệu riêng, hãy đăng nhập hoặc tạo tài khoản để hệ thống ghi nhận chính xác.</p>
         ${renderMetricGrid([
@@ -434,7 +440,7 @@ async function openReferralFlow() {
   openInfoModal({
     title: "Link giới thiệu của bạn",
     eyebrow: "Ưu đãi bạn bè",
-    image: "/src/assets/images/banners/hot-banner-a5-friend.png",
+    image: bannerA5,
     body: `
       <p>Gửi link này cho bạn bè. Mã sẽ được lưu trong 30 ngày để ghi nhận người giới thiệu khi bạn mới tạo tài khoản.</p>
       <div class="monthly-offer-link">
@@ -461,7 +467,7 @@ function openFreeshipModal() {
   openInfoModal({
     title: "Miễn phí vận chuyển từ 500.000đ",
     eyebrow: "Chính sách vận chuyển",
-    image: "/src/assets/images/banners/hot-banner-a6-freeship.png",
+    image: bannerA6,
     body: `
       <div class="monthly-offer-progress">
         <span>${subtotal >= target ? "Bạn đã mở khóa Freeship" : `Còn ${formatMoney(remaining)} để mở khóa Freeship`}</span>
@@ -535,7 +541,7 @@ function openInfoModal({ title, eyebrow = "", image = "", body = "", actions = [
     <div class="monthly-offer-modal__overlay" data-offer-close></div>
     <section class="monthly-offer-modal__panel" role="dialog" aria-modal="true" aria-labelledby="monthly-offer-title">
       <button class="monthly-offer-modal__close" type="button" data-offer-close aria-label="Đóng">×</button>
-      ${image ? `<img class="monthly-offer-modal__media" src="${escapeAttribute(image)}" alt="" loading="lazy" decoding="async" />` : ""}
+      ${image ? `<img class="monthly-offer-modal__media" data-banner-src="${escapeAttribute(image)}" alt="" loading="lazy" decoding="async" />` : ""}
       ${eyebrow ? `<p class="monthly-offer-modal__eyebrow">${escapeHtml(eyebrow)}</p>` : ""}
       <h2 class="monthly-offer-modal__title" id="monthly-offer-title">${escapeHtml(title)}</h2>
       <div class="monthly-offer-modal__body">${body}</div>
@@ -546,6 +552,21 @@ function openInfoModal({ title, eyebrow = "", image = "", body = "", actions = [
     </section>
   `;
   document.body.appendChild(modal);
+  const modalImage = modal.querySelector(".monthly-offer-modal__media");
+  if (modalImage) {
+    const source = modalImage.dataset.bannerSrc;
+    let retryCount = 0;
+    modalImage.addEventListener("error", () => {
+      retryCount += 1;
+      if (retryCount <= 2) {
+        const separator = source.includes("?") ? "&" : "?";
+        window.setTimeout(() => { modalImage.src = `${source}${separator}retry=${Date.now()}`; }, 250 * retryCount);
+        return;
+      }
+      modalImage.src = fallbackImage;
+    });
+    modalImage.src = source;
+  }
   document.body.classList.add("has-monthly-offer-modal");
 
   modal.querySelectorAll("[data-offer-close]").forEach((node) => {

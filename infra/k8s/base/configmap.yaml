@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: velura-api-config
+  namespace: velura
+data:
+  NODE_ENV: production
+  PORT: '8787'
+  API_ORIGIN: https://api-velura.royalai.dev
+  CORS_ORIGIN: https://velura.royalai.dev,https://admin.royalai.dev

@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
   envDir: envDirectory,
   publicDir: "../public",
   build: {
+    assetsInlineLimit: 0,
     outDir: "../dist",
     emptyOutDir: true,
     rollupOptions: {

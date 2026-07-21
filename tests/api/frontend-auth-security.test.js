@@ -26,6 +26,39 @@ test("admin browser code delegates identity and RBAC to the backend", async () =
   assert.doesNotMatch(browserCode, /Velura@123|reset123/i);
   assert.match(auth, /fetchAuthContext\s*\(/);
   assert.match(callback, /establishAuthoritativeSession\s*\(/);
+  assert.match(auth, /avatarEl\.replaceChildren\(avatarImage\)/);
+  assert.match(auth, /avatarImage\.addEventListener\("error"/);
+});
+
+test("admin KPI grids keep five-card modules on one wide-screen row", async () => {
+  const adminCss = await source("apps/admin-web/src/styles/admin.css");
+  assert.match(adminCss, /@media \(min-width: 1280px\)[\s\S]*repeat\(5, minmax\(0, 1fr\)\)/);
+  assert.match(adminCss, /admin-kpi-grid--accounts[\s\S]*admin-product-kpis[\s\S]*admin-promo-kpis/);
+  assert.match(adminCss, /admin-kpi-card__value[^{]*\{[^}]*white-space:\s*nowrap/);
+});
+
+test("admin dynamic icons use Vite hashed assets instead of cache-prone runtime paths", async () => {
+  const modules = ["admin", "products", "orders", "reviews", "returns-cskh", "pricing", "promotions", "logs", "dashboard"];
+  for (const moduleName of modules) {
+    const moduleSource = await source(`apps/admin-web/src/scripts/${moduleName}.js`);
+    assert.match(moduleSource, /import adminIconsUrl from ["']\.\.\/assets\/icons\/admin-icons\.svg\?url["']/);
+    assert.doesNotMatch(moduleSource, /\.\.\/\.\.\/assets\/icons\/admin-icons\.svg/);
+  }
+});
+
+test("admin dynamic action icons are published at their runtime URL", async () => {
+  const sprite = await source("apps/admin-web/public/assets/icons/admin-icons.svg");
+  assert.match(sprite, /<symbol id="eye"/);
+  assert.match(sprite, /<symbol id="edit"/);
+  assert.match(sprite, /<symbol id="lock"/);
+  const viteConfig = await source("apps/admin-web/vite.config.js");
+  assert.match(viteConfig, /assetsInlineLimit:\s*0/);
+});
+
+test("backend profile lookup forwards the authenticated JWT through users RLS", async () => {
+  const rbac = await source("apps/api/src/rbac.js");
+  assert.match(rbac, /const localDbOptions\s*=\s*\{\s*useAnonKey:\s*false\s*\}/);
+  assert.match(rbac, /const supabaseDbOptions\s*=\s*\{\s*useAnonKey:\s*true,\s*accessToken:\s*token\s*\}/);
 });
 
 test("Supabase OAuth: manual PKCE verifier, correct redirect_uri, raw exchange", async () => {
@@ -205,7 +238,7 @@ test("customer auth redesign preserves the live DOM and API contracts", async ()
 });
 
 test("customer member and guest flows require real auth sessions", async () => {
-  const [client, session, api, cart, main, profile, product, rbac] = await Promise.all([
+  const [client, session, api, cart, main, profile, product, chatbot, rbac] = await Promise.all([
     source("apps/user-web/src/scripts/modules/auth-client.js"),
     source("apps/user-web/src/scripts/modules/auth-session.js"),
     source("apps/user-web/src/scripts/modules/api.js"),
@@ -213,6 +246,7 @@ test("customer member and guest flows require real auth sessions", async () => {
     source("apps/user-web/src/scripts/main.js"),
     source("apps/user-web/src/scripts/modules/account-profile.js"),
     source("apps/user-web/src/scripts/modules/product-catalog.js"),
+    source("apps/user-web/src/scripts/modules/chatbot.js"),
     source("apps/api/src/rbac.js")
   ]);
 
@@ -242,6 +276,9 @@ test("customer member and guest flows require real auth sessions", async () => {
   assert.match(profile, /showGuestLoginModal\(\)/);
   assert.match(profile, /err\.status === 401 && !hasRealAuthSession\(\)/);
   assert.match(product, /member-lock-badge/);
+  assert.doesNotMatch(chatbot, /Clear session ID on startup/);
+  assert.doesNotMatch(chatbot, /window\.location\.assign\("\/src\/pages\/wishlist\/wishlist\.html/);
+  assert.match(chatbot, /localStorage\.setItem\("velura_wishlist_count", String\(persistedWishlist\.length\)\)/);
   assert.match(product, /\/src\/pages\/auth\/signup\.html/);
 
   assert.match(rbac, /import \{ verifyJwt \} from "\.\/auth-helper\.js"/);
@@ -250,16 +287,20 @@ test("customer member and guest flows require real auth sessions", async () => {
 });
 
 test("customer wishlist uses users.wishlist JSON and not a dedicated wishlist table", async () => {
-  const [wishlistRoute, legacyWishlistRoute, schema] = await Promise.all([
+  const [wishlistRoute, legacyWishlistRoute, schema, viteConfig] = await Promise.all([
     source("apps/api/src/user/wishlist.js"),
     source("apps/api/src/v1-wishlist-routes.js"),
-    source("database/database_user/schema.sql")
+    source("database/database_user/schema.sql"),
+    source("apps/user-web/vite.config.js")
   ]);
 
   const combinedRoutes = `${wishlistRoute}\n${legacyWishlistRoute}`;
   assert.match(wishlistRoute, /selectOne\("users"/);
   assert.match(wishlistRoute, /updateRows\("users"/);
   assert.match(wishlistRoute, /wishlist:\s*normalizeWishlist/);
+  assert.match(wishlistRoute, /useAnonKey:\s*false/);
+  assert.doesNotMatch(wishlistRoute, /useAnonKey:\s*true/);
+  assert.match(viteConfig, /wishlist:\s*resolve\(__dirname, "src\/pages\/wishlist\/wishlist\.html"\)/);
   assert.doesNotMatch(combinedRoutes, /["']Wishlists["']/);
   assert.doesNotMatch(combinedRoutes, /insertRow\(|deleteRows\(/);
   assert.match(schema, /wishlist\s+JSONB\s+NOT NULL DEFAULT '\[\]'/i);

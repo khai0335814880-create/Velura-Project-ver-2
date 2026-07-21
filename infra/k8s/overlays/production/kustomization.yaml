@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - ingress.yaml
+  - cloudflared.yaml
+  - cloudflared-origin-proxy.yaml
+  - api-path-ingress.yaml
+patches:
+  - path: cloudflared-user-proxy-patch.yaml
+  - path: cloudflared-admin-proxy-patch.yaml

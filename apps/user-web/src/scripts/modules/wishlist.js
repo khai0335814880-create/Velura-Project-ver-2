@@ -44,6 +44,9 @@ export function initWishlistPage() {
 
   const grid = document.querySelector(".wishlist-grid");
   const subtitle = document.querySelector(".wishlist-subtitle");
+  const title = document.querySelector(".wishlist-title");
+  const fromChatbot = new URLSearchParams(window.location.search).get("source") === "chatbot";
+  if (fromChatbot && title) title.textContent = "Phối đồ yêu thích";
   if (!grid) return;
 
   // Clear mock static content on init

@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { reviewApi } from "./review-api.js";
 
 const state = { rows: [], count: 0, active: "all", selected: null, currentPage: 1, itemsPerPage: 10, logs: [], logsPage: 1 };
@@ -12,7 +13,7 @@ export function escapeReviewHtml(value) {
 }
 
 function icon(name) {
-  return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeReviewHtml(name)}" /></svg>`;
+  return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapeReviewHtml(name)}" /></svg>`;
 }
 
 function formatDate(value) {

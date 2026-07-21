@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { productApi } from "./product-api.js";
 import { pricingApi } from "./pricing-api.js";
 
@@ -9,7 +10,7 @@ const toast = document.querySelector("#pricing-toast");
 export function escapePricingHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
 }
-function icon(name) { return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapePricingHtml(name)}"></use></svg>`; }
+function icon(name) { return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapePricingHtml(name)}"></use></svg>`; }
 function money(value) { return Number(value || 0).toLocaleString("vi-VN") + "đ"; }
 function formatDate(value) { const date = new Date(value); return Number.isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" }).format(date); }
 function discount(row) { const base = Number(row.base_price || 0); const sale = Number(row.sale_price ?? base); return base > sale && base > 0 ? Math.round((base - sale) * 100 / base) : 0; }

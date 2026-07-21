@@ -1,6 +1,8 @@
 import crypto from "node:crypto";
 import { config } from "./config.js";
 
+export const USER_SESSION_TTL_SECONDS = 60 * 60;
+
 function getJwtSecret() {
   if (!config.supabaseServiceRoleKey) {
     throw new Error("VELURA_SUPABASE_SERVICE_ROLE_KEY is required for JWT operations");
@@ -23,7 +25,7 @@ export function signJwt(payload) {
   const sHeader = Buffer.from(JSON.stringify(header)).toString("base64url");
   const sPayload = Buffer.from(JSON.stringify({
     ...payload,
-    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours expiry
+    exp: Math.floor(Date.now() / 1000) + USER_SESSION_TTL_SECONDS
   })).toString("base64url");
   const signature = crypto
     .createHmac("sha256", getJwtSecret())

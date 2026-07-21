@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: velura
+  namespace: velura
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: velura.royalai.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: velura-user-web, port: { number: 80 } }
+    - host: admin.royalai.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: velura-admin-web, port: { number: 80 } }
+    - host: api-velura.royalai.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: velura-api, port: { number: 8787 } }

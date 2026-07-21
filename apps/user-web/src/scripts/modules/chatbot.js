@@ -25,8 +25,6 @@ export function initChatbot() {
   const containers = Array.from(document.querySelectorAll(".chatbot-widget, .chatbot-page"));
   if (!containers.length) return;
 
-  // Clear session ID on startup to ensure a fresh new session when navigating to/re-entering the chatbot
-  localStorage.removeItem(SESSION_ID_KEY);
 
   const state = {
     guestId: getOrCreateGuestId(),
@@ -1062,24 +1060,30 @@ async function handleSaveOutfit(state, messageId, sessionId) {
       });
 
       if (productIds.length > 0) {
+        let persistedWishlist = null;
         for (const productId of productIds) {
           try {
-            await apiRequest("/api/user/wishlist", {
+            const result = await apiRequest("/api/user/wishlist", {
               method: "POST",
               body: { product_id: productId }
             });
+            if (Array.isArray(result?.wishlist)) {
+              persistedWishlist = result.wishlist;
+            }
           } catch (e) {
             console.error("Failed to add product to wishlist:", productId, e);
           }
         }
-        // Update badge
-        const currentCount = parseInt(localStorage.getItem("velura_wishlist_count") || "0", 10);
-        localStorage.setItem("velura_wishlist_count", currentCount + productIds.length);
+
+        // The badge must reflect the persisted, de-duplicated wishlist count.
+        if (persistedWishlist) {
+          localStorage.setItem("velura_wishlist_count", String(persistedWishlist.length));
+        }
         if (typeof updateWishlistBadge === "function") {
           updateWishlistBadge();
         }
       }
-      showToast("Đã lưu phối đồ vĩnh viễn vào tủ đồ cá nhân!");
+      showToast("Đã lưu phối đồ vào danh sách yêu thích!");
     } catch (err) {
       showToast(err.message || "Không thể lưu phối đồ.");
     }

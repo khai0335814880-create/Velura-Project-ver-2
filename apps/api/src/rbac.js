@@ -35,8 +35,6 @@ export async function buildAuthContext(req) {
     "role", "admin_role", "is_active", "is_verified", "created_at",
     "last_login_at", "version", "updated_at", "saved_addresses"
   ].join(",");
-  const dbOptions = { useAnonKey: true }; // Use anon key fallback for token validation too
-
   // Try Supabase Auth first
   let authUser = null;
   try {
@@ -48,12 +46,15 @@ export async function buildAuthContext(req) {
   const decoded = verifyJwt(token);
 
   if (decoded && !authUser?.id) {
+    // Password/OTP login uses a Velura API JWT, not a Supabase Auth JWT.
+    // Never forward it to PostgREST: Supabase cannot verify our signing key.
+    const localDbOptions = { useAnonKey: false };
     let profile = null;
     try {
       profile = await selectOne("users", {
         select: accountSelect,
         user_id: `eq.${decoded.user_id}`
-      }, dbOptions);
+      }, localDbOptions);
     } catch {
       profile = null;
     }
@@ -68,23 +69,26 @@ export async function buildAuthContext(req) {
       roleName: roleNames[roleCode] || "Member",
       isAdmin: profile.role === "admin",
       allowedPages: rolePages[roleCode] || rolePages.member,
-      accessToken: token
+      // Downstream repositories must not forward a locally signed JWT to Supabase.
+      accessToken: ""
     };
   }
 
   if (!authUser?.id) return buildGuestContext();
 
+  // Supabase Auth JWTs are forwarded so PostgREST evaluates RLS as the caller.
+  const supabaseDbOptions = { useAnonKey: true, accessToken: token };
   let profile = null;
   try {
     profile = await selectOne("users", {
       select: accountSelect,
       auth_user_id: `eq.${authUser.id}`
-    }, dbOptions);
+    }, supabaseDbOptions);
     if (!profile) {
       profile = await selectOne("users", {
         select: accountSelect,
         email: `eq.${authUser.email}`
-      }, dbOptions);
+      }, supabaseDbOptions);
     }
   } catch {
     profile = null;

@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { accountApi } from "./account-api.js";
 
 const state = {
@@ -50,7 +51,7 @@ export function escapeHtml(value) {
 }
 
 function icon(name) {
-  return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeHtml(name)}"></use></svg>`;
+  return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapeHtml(name)}"></use></svg>`;
 }
 
 function initials(row) {

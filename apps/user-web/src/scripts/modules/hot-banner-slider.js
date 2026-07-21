@@ -1,3 +1,11 @@
+import bannerA1 from "../../assets/images/banners/hot-banner-a1-birthday.png";
+import bannerA2 from "../../assets/images/banners/hot-banner-a2-last-days.png";
+import bannerA3 from "../../assets/images/banners/hot-banner-a3-combo.png";
+import bannerA4 from "../../assets/images/banners/hot-banner-a4-loyal.png";
+import bannerA5 from "../../assets/images/banners/hot-banner-a5-friend.png";
+import bannerA6 from "../../assets/images/banners/hot-banner-a6-freeship.png";
+import fallbackImage from "../../assets/images/placeholder.jpg";
+
 const SLIDE_INTERVAL_MS = 4500;
 
 const HOT_BANNERS = [
@@ -8,7 +16,7 @@ const HOT_BANNERS = [
     description: "Voucher BDAY15 giảm 15% và quà bất ngờ trong tháng sinh nhật",
     ctaText: "Nhận quà ngay",
     ctaLink: "/src/pages/offers.html?offer=A1",
-    imageSrc: "/src/assets/images/banners/hot-banner-a1-birthday.png",
+    imageSrc: bannerA1,
     imageAlt: "Tháng sinh nhật của bạn - Velura có quà nhỏ dành riêng",
     showCondition: null
   },
@@ -19,7 +27,7 @@ const HOT_BANNERS = [
     description: "Flash Sale ngắn hạn, giảm trực tiếp trên các sản phẩm được chọn",
     ctaText: "Xem ngay",
     ctaLink: "/src/pages/products/list.html?sale=true&campaign=flash-sale",
-    imageSrc: "/src/assets/images/banners/hot-banner-a2-last-days.png",
+    imageSrc: bannerA2,
     imageAlt: "Chỉ còn 2 ngày - ưu đãi Flash Sale tháng này",
     showCondition: null
   },
@@ -30,7 +38,7 @@ const HOT_BANNERS = [
     description: "Mua trọn set phối sẵn - tiết kiệm thêm 10%",
     ctaText: "Thêm vào giỏ trọn set",
     ctaLink: "/src/pages/collections.html?type=combo&offer=monthly-combo",
-    imageSrc: "/src/assets/images/banners/hot-banner-a3-combo.png",
+    imageSrc: bannerA3,
     imageAlt: "Combo phối đồ tiết kiệm - mua trọn set tiết kiệm thêm 10%",
     showCondition: null
   },
@@ -41,7 +49,7 @@ const HOT_BANNERS = [
     description: "Quyền lợi tự động theo tổng chi tiêu tích lũy",
     ctaText: "Xem quyền lợi",
     ctaLink: "/src/pages/offers.html?offer=A4",
-    imageSrc: "/src/assets/images/banners/hot-banner-a4-loyal.png",
+    imageSrc: bannerA4,
     imageAlt: "Khách hàng thân thiết - quyền lợi theo tổng chi tiêu tích lũy",
     showCondition: null
   },
@@ -52,7 +60,7 @@ const HOT_BANNERS = [
     description: "Bạn nhận 50.000đ, người mới nhận 30.000đ khi giới thiệu thành công",
     ctaText: "Chia sẻ ngay",
     ctaLink: "/src/pages/offers.html?offer=A5",
-    imageSrc: "/src/assets/images/banners/hot-banner-a5-friend.png",
+    imageSrc: bannerA5,
     imageAlt: "Rủ bạn bè - chia sẻ voucher cho bạn",
     showCondition: null
   },
@@ -63,7 +71,7 @@ const HOT_BANNERS = [
     description: "Miễn phí vận chuyển tiêu chuẩn toàn quốc cho đơn từ 500.000đ",
     ctaText: "Xem ngay",
     ctaLink: "/src/pages/offers.html?offer=A6",
-    imageSrc: "/src/assets/images/banners/hot-banner-a6-freeship.png",
+    imageSrc: bannerA6,
     imageAlt: "FreeShip cho đơn từ 500k - áp dụng toàn quốc",
     showCondition: null
   }
@@ -107,6 +115,7 @@ function initSingleHotBannerSlider(root) {
   }
 
   track.innerHTML = banners.map(renderSlide).join("");
+  installImageFallbacks(track);
   dots.innerHTML = banners.map((banner, index) => `
     <button class="hot-banner-slider__dot js-hot-banner-dot" type="button"
       aria-label="Xem banner ${escapeHtml(banner.id)}" data-index="${index}"></button>
@@ -201,11 +210,12 @@ function initOfferBannerList() {
         <a class="offer-banner-row__cta" href="${escapeHtml(banner.ctaLink)}" data-banner-id="${escapeHtml(banner.id)}">${escapeHtml(banner.ctaText)} →</a>
       </div>
       <a class="offer-banner-row__image-link" href="${escapeHtml(banner.ctaLink)}" aria-label="${escapeHtml(banner.title)}" data-banner-id="${escapeHtml(banner.id)}">
-        <img class="offer-banner-row__image" src="${escapeHtml(banner.imageSrc)}" alt="${escapeHtml(banner.imageAlt)}"
+        <img class="offer-banner-row__image" data-banner-src="${escapeHtml(banner.imageSrc)}" alt="${escapeHtml(banner.imageAlt)}"
           loading="${index < 2 ? "eager" : "lazy"}" decoding="async" />
       </a>
     </article>
   `).join("");
+  installImageFallbacks(list);
 }
 
 function getBannerBenefit(id) {
@@ -256,13 +266,14 @@ function initHotOfferWidget() {
   if (count) count.textContent = `${banners.length || HOT_BANNERS.length} tin`;
   list.innerHTML = preview.map((banner) => `
     <a class="hot-offer-widget__item" href="${escapeHtml(banner.ctaLink)}" data-banner-id="${escapeHtml(banner.id)}">
-      <img src="${escapeHtml(banner.imageSrc)}" alt="" loading="lazy" decoding="async" />
+      <img data-banner-src="${escapeHtml(banner.imageSrc)}" alt="" loading="lazy" decoding="async" />
       <span>
         <strong>${escapeHtml(banner.title)}</strong>
         <small>${escapeHtml(banner.description)}</small>
       </span>
     </a>
   `).join("");
+  installImageFallbacks(list);
 }
 
 function getVisibleBanners(userState) {
@@ -356,7 +367,7 @@ function renderSlide(banner, index) {
   return `
     <article class="hot-banner-slide" aria-label="${escapeHtml(banner.title)}">
       <a class="hot-banner-slide__link" href="${escapeHtml(banner.ctaLink)}" data-banner-id="${escapeHtml(banner.id)}">
-        <img class="hot-banner-slide__image" src="${escapeHtml(banner.imageSrc)}" alt="${escapeHtml(banner.imageAlt)}"
+        <img class="hot-banner-slide__image" data-banner-src="${escapeHtml(banner.imageSrc)}" alt="${escapeHtml(banner.imageAlt)}"
           loading="${index === 0 ? "eager" : "lazy"}" decoding="async" />
         <span class="hot-banner-slide__sr">
           ${escapeHtml(banner.title)}. ${escapeHtml(banner.description)}. ${escapeHtml(banner.ctaText)}.
@@ -364,6 +375,23 @@ function renderSlide(banner, index) {
       </a>
     </article>
   `;
+}
+
+function installImageFallbacks(root) {
+  root.querySelectorAll("img[data-banner-src]").forEach((image) => {
+    const source = image.dataset.bannerSrc;
+    let retryCount = 0;
+    image.addEventListener("error", () => {
+      retryCount += 1;
+      if (retryCount <= 2) {
+        const separator = source.includes("?") ? "&" : "?";
+        window.setTimeout(() => { image.src = `${source}${separator}retry=${Date.now()}`; }, 250 * retryCount);
+        return;
+      }
+      image.src = fallbackImage;
+    });
+    image.src = source;
+  });
 }
 
 function restartProgress(progress) {

@@ -51,7 +51,8 @@ export default defineConfig(({ mode }) => {
         styleQuiz: resolve(__dirname, "src/pages/ai/style-quiz.html"),
         myOrders: resolve(__dirname, "src/pages/account/my-orders.html"),
         productReview: resolve(__dirname, "src/pages/account/product-review.html"),
-        collections: resolve(__dirname, "src/pages/collections.html")
+        collections: resolve(__dirname, "src/pages/collections.html"),
+        wishlist: resolve(__dirname, "src/pages/wishlist/wishlist.html")
       }
     }
   },

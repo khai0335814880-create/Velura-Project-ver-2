@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { pricingApi } from "./pricing-api.js";
 import { productApi } from "./product-api.js";
 
@@ -9,7 +10,7 @@ const toast = document.querySelector("#promo-toast");
 export function escapePromotionHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
 }
-function icon(name) { return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapePromotionHtml(name)}"></use></svg>`; }
+function icon(name) { return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapePromotionHtml(name)}"></use></svg>`; }
 function money(value) { return Number(value || 0).toLocaleString("vi-VN") + "đ"; }
 function date(value) { if (!value) return "-"; const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? "-" : new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).format(parsed); }
 function badge(active) { return `<span class="admin-badge admin-badge--${active ? "success" : "warning"}">${active ? "Đang hoạt động" : "Tạm dừng"}</span>`; }

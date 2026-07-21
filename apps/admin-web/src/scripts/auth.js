@@ -96,7 +96,19 @@ function updateSidebarForRole(session) {
   var roleEl = document.querySelector(".admin-profile__copy small");
   if (roleEl) roleEl.textContent = session.role;
   var avatarEl = document.querySelector(".admin-profile__avatar");
-  if (avatarEl) avatarEl.textContent = session.avatar || session.name.slice(0, 2).toUpperCase();
+  if (avatarEl) {
+    var fallbackAvatar = (session.name || "AD").slice(0, 2).toUpperCase();
+    var avatarUrl = typeof session.avatar === "string" && /^https:\/\//i.test(session.avatar) ? session.avatar : "";
+    avatarEl.textContent = fallbackAvatar;
+    if (avatarUrl) {
+      var avatarImage = document.createElement("img");
+      avatarImage.src = avatarUrl;
+      avatarImage.alt = "";
+      avatarImage.referrerPolicy = "no-referrer";
+      avatarImage.addEventListener("error", function () { avatarEl.textContent = fallbackAvatar; }, { once: true });
+      avatarEl.replaceChildren(avatarImage);
+    }
+  }
 
   // Add logout
   if (!document.querySelector("[data-admin-logout]")) {

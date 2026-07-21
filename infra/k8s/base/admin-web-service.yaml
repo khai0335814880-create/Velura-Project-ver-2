@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: velura-admin-web
+  namespace: velura
+spec:
+  type: ClusterIP
+  selector: { app: velura-admin-web }
+  ports: [{ name: http, port: 80, targetPort: http }]

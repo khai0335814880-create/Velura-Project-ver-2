@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { returnApi } from "./return-api.js";
 import { productApi } from "./product-api.js";
 import { CONFIG } from "./config.js";
@@ -44,7 +45,7 @@ function getEvidenceImageUrl(img) {
   return API_BASE + (img.startsWith("/") ? img : "/" + img);
 }
 
-function icon(name) { return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeServiceHtml(name)}"></use></svg>`; }
+function icon(name) { return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapeServiceHtml(name)}"></use></svg>`; }
 function formatDate(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" }).format(date);

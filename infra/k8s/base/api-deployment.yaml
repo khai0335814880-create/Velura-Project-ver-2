@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: velura-api
+  namespace: velura
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: velura-api }
+  template:
+    metadata:
+      labels: { app: velura-api }
+    spec:
+      containers:
+        - name: api
+          image: localhost:5000/velura-api:prod-20260721-6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef: { name: velura-api-config }
+            - secretRef: { name: velura-api-secrets }
+          ports: [{ name: http, containerPort: 8787 }]
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 50m, memory: 256Mi }
+            limits: { cpu: 750m, memory: 768Mi }

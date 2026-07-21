@@ -75,7 +75,7 @@ async function getWishlistProductIds(userId) {
   const user = await selectOne("users", {
     select: "user_id,wishlist",
     user_id: `eq.${userId}`
-  }, { useAnonKey: true });
+  }, { useAnonKey: false });
 
   return normalizeWishlist(user?.wishlist);
 }
@@ -84,7 +84,7 @@ async function saveWishlistProductIds(userId, wishlist) {
   await updateRows("users", { user_id: `eq.${userId}` }, {
     wishlist: normalizeWishlist(wishlist),
     updated_at: new Date().toISOString()
-  }, { useAnonKey: true });
+  }, { useAnonKey: false });
 }
 
 async function hydrateWishlistProducts(wishlist) {
@@ -94,7 +94,7 @@ async function hydrateWishlistProducts(wishlist) {
   const { rows } = await selectRows("product", {
     product_id: `in.(${ids.join(",")})`,
     status: "eq.on_sale"
-  }, { useAnonKey: true });
+  }, { useAnonKey: false });
 
   const order = new Map(ids.map((id, index) => [id, index]));
   return rows.sort((a, b) => (order.get(a.product_id) ?? 0) - (order.get(b.product_id) ?? 0));
@@ -105,7 +105,7 @@ async function ensureProductExists(productId) {
     select: "product_id",
     product_id: `eq.${productId}`,
     status: "eq.on_sale"
-  }, { useAnonKey: true });
+  }, { useAnonKey: false });
 
   if (!product) {
     throw new HttpError(404, "NOT_FOUND", "Không tìm thấy sản phẩm");

@@ -1,3 +1,4 @@
+import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { auditLogApi } from "./audit-log-api.js";
 import { accountApi } from "./account-api.js";
 
@@ -8,7 +9,7 @@ const overlay = document.querySelector("#log-overlay");
 export function escapeAuditHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
 }
-function icon(name) { return `<svg class="admin-line-icon"><use href="../../assets/icons/admin-icons.svg#${escapeAuditHtml(name)}"></use></svg>`; }
+function icon(name) { return `<svg class="admin-line-icon"><use href="${adminIconsUrl}#${escapeAuditHtml(name)}"></use></svg>`; }
 function date(value) { if (!value) return "-"; const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? "-" : new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" }).format(parsed); }
 function filters() { return `<form class="admin-filter-bar admin-log-filter" data-log-filter><label class="admin-search-field">${icon("search")}<input class="admin-form-control" name="q" placeholder="Tìm hành động, đối tượng hoặc admin" data-log-search></label><select class="admin-form-control" name="module" data-log-module><option value="">Tất cả phân hệ</option>${["accounts", "products", "orders", "reviews", "returns", "support", "pricing", "promotions", "vouchers", "system"].map((value) => `<option value="${value}">${value}</option>`).join("")}</select><select class="admin-form-control" name="result" data-log-result><option value="">Tất cả kết quả</option><option value="success">Thành công</option><option value="failure">Thất bại</option></select><div class="admin-filter-bar__actions"><button class="admin-btn admin-btn--filter admin-btn--sm">Lọc</button><button class="admin-btn admin-btn--ghost admin-btn--sm" type="reset">Đặt lại</button></div></form>`; }
 function table() {
