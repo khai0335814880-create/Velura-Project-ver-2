@@ -4,16 +4,16 @@ import { createReviewService } from "../../apps/api/src/reviews/review-service.j
 
 const REVIEW_ID = "40000000-0000-4000-8000-000000000001";
 
-test("review operator reads and mutates through the caller token", async () => {
+test("review operator reads and unhides through the caller token", async () => {
   let received;
   const service = createReviewService({ repository: {
     list: async (filters, token) => { received = { filters, token }; return { rows: [], count: 0 }; },
-    approve: async (_id, input, token) => ({ ...input, token })
+    unhide: async (_id, input, token) => ({ ...input, token })
   } });
   await service.list(context("admin_operator_danhgia_review"), new URLSearchParams("rating=5&limit=20"));
   assert.equal(received.filters.rating, "5");
   assert.equal(received.token, "jwt-token");
-  const result = await service.approve(context("admin_operator_danhgia_review"), REVIEW_ID, { expectedVersion: 2 });
+  const result = await service.unhide(context("admin_operator_danhgia_review"), REVIEW_ID, { expectedVersion: 2 });
   assert.equal(result.expectedVersion, 2);
 });
 

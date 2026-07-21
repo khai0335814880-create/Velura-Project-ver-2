@@ -52,7 +52,7 @@ function actions(row) {
     <button class="admin-icon-button admin-icon-button--sm" title="Thao tác" data-review-menu="${id}">${icon("edit")}</button>
     <div class="admin-dropdown admin-table-action-menu admin-review-action-menu" id="review-menu-${id}" hidden>
       <button data-review-detail="${id}">${icon("eye")}<span>Xem chi tiết</span></button>
-      ${row.status !== "approved" ? `<button data-review-action="approve" data-review-id="${id}">${icon("check")}<span>Phê duyệt</span></button>` : ""}
+      ${row.status === "rejected" ? `<button data-review-action="unhide" data-review-id="${id}">${icon("unlock")}<span>Mở ẩn</span></button>` : ""}
       <button data-review-action="reply" data-review-id="${id}">${icon("edit")}<span>Phản hồi</span></button>
       ${row.status !== "rejected" ? `<button class="admin-review-action-menu__danger" data-review-action="hide" data-review-id="${id}">${icon("lock")}<span>Ẩn đánh giá</span></button>` : ""}
       <button data-review-action="escalate" data-review-id="${id}">${icon("support")}<span>Tạo ticket CSKH</span></button>
@@ -225,9 +225,10 @@ async function openDetail(id) {
 function openAction(type, id) {
   const row = state.rows.find((item) => item.review_id === id);
   if (!row) return;
-  const textarea = type === "approve" ? '<textarea class="admin-form-control admin-form-textarea" name="actionNote" maxlength="500" placeholder="Ghi chú nội bộ"></textarea>' : `<textarea class="admin-form-control admin-form-textarea" name="value" minlength="${type === "reply" ? 1 : 10}" maxlength="2000" required></textarea>`;
-  const titles = { approve: "Phê duyệt đánh giá", hide: "Ẩn đánh giá", reply: "Phản hồi đánh giá", escalate: "Tạo ticket CSKH" };
-  overlay.innerHTML = `<div class="admin-modal-overlay"><section class="admin-modal"><form data-review-action-form data-type="${type}" data-review-id="${escapeReviewHtml(id)}"><header class="admin-modal__header"><h2>${titles[type]}</h2><button class="admin-icon-button" type="button" data-review-close>×</button></header><div class="admin-modal__body"><p>${escapeReviewHtml(row.comment || "—")}</p><label class="admin-form-group"><span class="admin-form-label">${type === "reply" ? "Nội dung phản hồi" : "Lý do / ghi chú"}</span>${textarea}</label></div><footer class="admin-modal__footer"><button class="admin-btn admin-btn--ghost" type="button" data-review-close>Đóng</button><button class="admin-btn admin-btn--secondary" type="submit">Xác nhận</button></footer></form></section></div>`;
+  const textarea = type === "unhide" ? "" : `<textarea class="admin-form-control admin-form-textarea" name="value" minlength="${type === "reply" ? 1 : 10}" maxlength="2000" required></textarea>`;
+  const titles = { unhide: "Mở ẩn đánh giá", hide: "Ẩn đánh giá", reply: "Phản hồi đánh giá", escalate: "Tạo ticket CSKH" };
+  const field = textarea ? `<label class="admin-form-group"><span class="admin-form-label">${type === "reply" ? "Nội dung phản hồi" : "Lý do / ghi chú"}</span>${textarea}</label>` : '<p>Đánh giá sẽ được hiển thị lại ngay sau khi xác nhận.</p>';
+  overlay.innerHTML = `<div class="admin-modal-overlay"><section class="admin-modal"><form data-review-action-form data-type="${type}" data-review-id="${escapeReviewHtml(id)}"><header class="admin-modal__header"><h2>${titles[type]}</h2><button class="admin-icon-button" type="button" data-review-close>×</button></header><div class="admin-modal__body"><p>${escapeReviewHtml(row.comment || "—")}</p>${field}</div><footer class="admin-modal__footer"><button class="admin-btn admin-btn--ghost" type="button" data-review-close>Đóng</button><button class="admin-btn admin-btn--secondary" type="submit">Xác nhận</button></footer></form></section></div>`;
 }
 
 async function submitAction(form) {
@@ -238,7 +239,7 @@ async function submitAction(form) {
   const submit = form.querySelector('[type="submit"]');
   submit.disabled = true;
   try {
-    if (type === "approve") await reviewApi.approve(row.review_id, { ...payload, actionNote: form.actionNote.value });
+    if (type === "unhide") await reviewApi.unhide(row.review_id, payload);
     if (type === "hide") await reviewApi.hide(row.review_id, { ...payload, reason: value });
     if (type === "reply") await reviewApi.reply(row.review_id, { ...payload, reply: value });
     if (type === "escalate") await reviewApi.escalate(row.review_id, { ...payload, reason: value });

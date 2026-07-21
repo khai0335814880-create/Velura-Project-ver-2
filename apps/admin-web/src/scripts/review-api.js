@@ -17,8 +17,8 @@ export const reviewApi = {
   get(reviewId) {
     return request(`/api/v1/admin/reviews/${encodeURIComponent(reviewId)}`);
   },
-  approve(reviewId, body) {
-    return request(`/api/v1/admin/reviews/${encodeURIComponent(reviewId)}/approve`, { method: "POST", body });
+  unhide(reviewId, body) {
+    return request(`/api/v1/admin/reviews/${encodeURIComponent(reviewId)}/unhide`, { method: "POST", body });
   },
   hide(reviewId, body) {
     return request(`/api/v1/admin/reviews/${encodeURIComponent(reviewId)}/hide`, { method: "POST", body });

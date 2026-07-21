@@ -30,3 +30,27 @@ spec:
                 name: velura-api
                 port:
                   number: 8787
+    - host: admin.royalai.dev
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: velura-api
+                port:
+                  number: 8787
+          - path: /uploads
+            pathType: Prefix
+            backend:
+              service:
+                name: velura-api
+                port:
+                  number: 8787
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: velura-api
+                port:
+                  number: 8787

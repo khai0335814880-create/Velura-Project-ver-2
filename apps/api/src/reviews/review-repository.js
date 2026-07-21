@@ -25,11 +25,10 @@ export function createReviewRepository() {
       }, authOptions(accessToken));
     },
 
-    async approve(reviewId, input, accessToken) {
-      return callRpc("admin_approve_review", {
+    async unhide(reviewId, input, accessToken) {
+      return callRpc("admin_unhide_review", {
         p_review_id: reviewId,
-        p_expected_version: input.expectedVersion,
-        p_action_note: input.actionNote || null
+        p_expected_version: input.expectedVersion
       }, { accessToken });
     },
 

@@ -35,6 +35,7 @@ const MIGRATIONS = [
   '005_uc_a04_a05_a06_rpcs.sql',
   '005b_fix_rpc_actor_role.sql',
   '005c_fix_audit_actions.sql',
+  '006_admin_unhide_review.sql',
   '006_uc_a01_a06_rls_hardening.sql',
   '007_uc_a04_review_product_read.sql',
   '008_uc_a06_base_sale_price_update.sql',

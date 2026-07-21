@@ -36,11 +36,11 @@ export function createReviewService({ repository }) {
       return review;
     },
 
-    async approve(context, reviewId, body) {
+    async unhide(context, reviewId, body) {
       requireReviewAdmin(context);
       const expectedVersion = parseInt(body?.expectedVersion || "0");
       if (!expectedVersion) throw new HttpError(422, "VALIDATION_ERROR", "expectedVersion required");
-      return repository.approve(reviewId, { actionNote: body.actionNote, expectedVersion }, context.accessToken);
+      return repository.unhide(reviewId, { expectedVersion }, context.accessToken);
     },
 
     async hide(context, reviewId, body) {

@@ -23,9 +23,9 @@ export async function handleReviewRoute({ req, res, url, parts, context, headers
     return true;
   }
 
-  if (req.method === "POST" && parts[5] === "approve" && parts.length === 6) {
+  if (req.method === "POST" && parts[5] === "unhide" && parts.length === 6) {
     const body = await readJson(req, config.maxBodyBytes);
-    sendJson(res, 200, await service.approve(context, reviewId, body), headers);
+    sendJson(res, 200, await service.unhide(context, reviewId, body), headers);
     return true;
   }
 
