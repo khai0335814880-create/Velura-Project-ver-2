@@ -101,8 +101,8 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
         kpis[2].querySelector("strong").textContent = fmtNum(data.operations.openSupportTickets);
         kpis[3].querySelector("strong").textContent = fmtNum(data.operations.lowStockProducts);
 
-        kpis[4].querySelector("strong").textContent = fmtNum(data.operations.urgentReviews);
-        kpis[4].querySelector("small").textContent = "Đang hiển thị công khai";
+        kpis[4].querySelector("strong").textContent = fmtNum(data.operations.hiddenReviews);
+        kpis[4].querySelector("small").textContent = fmtNum(data.operations.approvedReviews) + " đã duyệt";
       }
 
       var alertCountBtn = opsPanel.querySelector("[data-dashboard-drawer='alerts']");
@@ -132,8 +132,8 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
         var productsStatus = data.operations.lowStockProducts > 0 ? "danger" : "success";
         var productsStatusLabel = productsStatus === "danger" ? "Rủi ro" : "Tốt";
         
-        var reviewsStatus = data.operations.urgentReviews > 0 ? "warning" : "success";
-        var reviewsStatusLabel = reviewsStatus === "warning" ? "Cần chú ý" : "Tốt";
+        var reviewsStatus = "neutral";
+        var reviewsStatusLabel = "Thông tin";
         
         var returnsStatus = (data.operations.openReturns > 0 || data.operations.openSupportTickets > 0) ? "warning" : "success";
         var returnsStatusLabel = returnsStatus === "warning" ? "Cần chú ý" : "Tốt";
@@ -170,7 +170,7 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
               <span class="dashboard-health-dot dashboard-health-dot--${reviewsStatus}"></span>
               <strong>Đánh giá</strong>
             </div>
-            <small>${fmtNum(data.operations.urgentReviews)} đánh giá tiêu cực đang hiển thị</small>
+            <small>${fmtNum(data.operations.approvedReviews)} đã duyệt · ${fmtNum(data.operations.hiddenReviews)} đã ẩn</small>
           </a>
           <a class="dashboard-health-card" href="./returns-cskh.html">
             <div class="dashboard-health-card__head">
@@ -215,7 +215,6 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
         var tasks = [
           { count: data.operations.openReturns, title: `Xử lý ${fmtNum(data.operations.openReturns)} phiếu đổi/trả chờ xử lý`, desc: "Đổi trả & CSKH · Trạng thái Chờ xử lý", badge: "Cao", badgeClass: "admin-badge--danger", link: "./returns-cskh.html#returns" },
           { count: data.operations.paymentErrors, title: `Kiểm tra ${fmtNum(data.operations.paymentErrors)} đơn thanh toán lỗi`, desc: "Quản lý đơn hàng · Cảnh báo hệ thống", badge: "Cao", badgeClass: "admin-badge--danger", link: "./orders.html" },
-          { count: data.operations.urgentReviews, title: `Phản hồi ${fmtNum(data.operations.urgentReviews)} đánh giá tiêu cực`, desc: "Quản lý đánh giá · Đang hiển thị công khai", badge: "Vừa", badgeClass: "admin-badge--warning", link: "./reviews.html" },
           { count: data.operations.lowStockProducts, title: `Bổ sung tồn kho cho ${fmtNum(data.operations.lowStockProducts)} sản phẩm`, desc: "Quản lý sản phẩm · Tồn kho thấp", badge: "Vừa", badgeClass: "admin-badge--warning", link: "./products.html" }
         ].filter(function (task) { return Number(task.count) > 0; });
         tasks.forEach(function (task, index) { task.index = String(index + 1).padStart(2, "0"); });
@@ -564,14 +563,14 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
       rows.push(toCsvRow(["Phiếu đổi/trả chờ xử lý", data.operations.openReturns, data.operations.openReturns > 0 ? "Khẩn cấp" : "Bình thường"]));
       rows.push(toCsvRow(["Ticket đang xử lý", data.operations.openSupportTickets, data.operations.openSupportTickets > 0 ? "Cần chú ý" : "Bình thường"]));
       rows.push(toCsvRow(["Sản phẩm sắp hết hàng", data.operations.lowStockProducts, data.operations.lowStockProducts > 0 ? "Khẩn cấp" : "Bình thường"]));
-      rows.push(toCsvRow(["Đánh giá tiêu cực", data.operations.urgentReviews, data.operations.urgentReviews > 0 ? "Cần chú ý" : "Bình thường"]));
+      rows.push(toCsvRow(["Đánh giá đã duyệt", data.operations.approvedReviews, "Đã duyệt"]));
+      rows.push(toCsvRow(["Đánh giá đã ẩn", data.operations.hiddenReviews, "Đã ẩn"]));
       rows.push("");
       rows.push(toCsvRow(["II. DANH SÁCH CÔNG VIỆC CẦN XỬ LÝ HÔM NAY"]));
       rows.push(toCsvRow(["STT", "Công việc", "Hạn xử lý", "Mức độ ưu tiên"]));
       rows.push(toCsvRow(["1", "Xử lý " + data.operations.openReturns + " phiếu đổi/trả chờ xử lý", data.operations.returnsDueSoon + " phiếu sắp chạm SLA 48 giờ", "Cao"]));
       rows.push(toCsvRow(["2", "Kiểm tra " + data.operations.paymentErrors + " đơn thanh toán lỗi", "Cảnh báo hệ thống", "Cao"]));
-      rows.push(toCsvRow(["3", "Phản hồi " + data.operations.urgentReviews + " đánh giá tiêu cực", "Trong hôm nay", "Vừa"]));
-      rows.push(toCsvRow(["4", "Bổ sung tồn kho cho " + data.operations.lowStockProducts + " sản phẩm", "Tồn kho thấp", "Vừa"]));
+      rows.push(toCsvRow(["3", "Bổ sung tồn kho cho " + data.operations.lowStockProducts + " sản phẩm", "Tồn kho thấp", "Vừa"]));
     }
 
     if (typeIndex === 2) {

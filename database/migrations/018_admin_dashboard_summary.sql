@@ -218,11 +218,8 @@ operations as (
     ) as returns_due_soon,
     (select count(*)::integer from public.support_ticket where status::text = 'processing') as open_support_tickets,
     (select count(distinct product_id)::integer from public.variant where stock_quantity <= low_stock_threshold) as low_stock_products,
-    (select count(*)::integer from public.review where status::text = 'pending') as pending_reviews,
-    (select count(*)::integer
-      from public.review
-      where status::text = 'approved' and rating <= 2
-    ) as urgent_reviews
+    (select count(*)::integer from public.review where status::text = 'approved') as approved_reviews,
+    (select count(*)::integer from public.review where status::text = 'rejected') as hidden_reviews
 ),
 daily_series as (
   select generate_series(
@@ -301,7 +298,8 @@ select jsonb_build_object(
     'returnsDueSoon', op.returns_due_soon,
     'openSupportTickets', op.open_support_tickets,
     'lowStockProducts', op.low_stock_products,
-    'urgentReviews', op.urgent_reviews
+    'approvedReviews', op.approved_reviews,
+    'hiddenReviews', op.hidden_reviews
   ),
   'business', jsonb_build_object(
     'orderCount', cm.order_count,
@@ -311,7 +309,6 @@ select jsonb_build_object(
     'completionRate', round(cm.completion_rate, 1),
     'promotionRevenue', round(cm.promo_revenue),
     'promotionRevenueShare', case when cm.revenue > 0 then round(100.0 * cm.promo_revenue / cm.revenue, 1) else 0 end,
-    'pendingReviews', op.pending_reviews,
     'promoOrdersCount', cm.promo_orders,
     'totalDiscount', round(cm.total_discount),
     'mostUsedVoucher', coalesce(vu.code, 'Không có'),

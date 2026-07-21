@@ -31,8 +31,9 @@ test("dashboard operational KPIs use exact filter semantics", () => {
   const ui = readFileSync(new URL("../../apps/admin-web/src/scripts/dashboard.js", import.meta.url), "utf8");
   assert.match(sql, /return_exchange where status::text = 'pending'/);
   assert.match(sql, /support_ticket where status::text = 'processing'/);
-  assert.match(sql, /status::text = 'approved' and rating <= 2/);
+  assert.match(sql, /status::text = 'approved'.*approved_reviews/);
+  assert.match(sql, /status::text = 'rejected'.*hidden_reviews/);
   assert.doesNotMatch(ui, /data\.business\.pendingReviews/);
-  assert.doesNotMatch(ui, /Đánh giá cần duyệt|Hạn trong tuần này|Xem tất cả/);
+  assert.doesNotMatch(ui, /Đánh giá cần duyệt|Đánh giá tiêu cực|đánh giá tiêu cực|urgentReviews|Hạn trong tuần này|Xem tất cả/);
   assert.match(ui, /nhóm cảnh báo/);
 });
