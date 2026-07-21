@@ -669,13 +669,13 @@ input:checked + .admin-sim-slider:before {
 .admin-kpi-card__value { max-width: 100%; overflow: hidden; font-size: clamp(1.25rem, 1.7vw, 1.75rem); line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 
 @media (min-width: 1280px) {
-  .admin-kpi-grid:is(.admin-kpi-grid--accounts, .admin-product-kpis, .admin-review-kpis, .admin-log-kpis, .admin-promo-kpis, .admin-service-kpis) {
+  .admin-kpi-grid:is(.admin-kpi-grid--accounts, .admin-product-kpis, .admin-log-kpis, .admin-promo-kpis, .admin-service-kpis) {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1101px) and (max-width: 1279px) {
-  .admin-kpi-grid:is(.admin-kpi-grid--accounts, .admin-product-kpis, .admin-review-kpis, .admin-log-kpis, .admin-promo-kpis, .admin-service-kpis) {
+  .admin-kpi-grid:is(.admin-kpi-grid--accounts, .admin-product-kpis, .admin-log-kpis, .admin-promo-kpis, .admin-service-kpis) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

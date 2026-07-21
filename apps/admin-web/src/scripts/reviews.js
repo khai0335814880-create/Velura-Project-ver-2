@@ -109,7 +109,8 @@ function table() {
 function updateKpis() {
   const approvedCount = state.rows.filter((row) => row.status === "approved").length;
   const hiddenCount = state.rows.filter((row) => row.status === "rejected").length;
-  const values = [state.count, approvedCount, hiddenCount];
+  const repliedCount = state.rows.filter((row) => String(row.admin_reply || "").trim()).length;
+  const values = [state.count, approvedCount, hiddenCount, repliedCount];
   document.querySelectorAll(".admin-review-kpis .admin-kpi-card__value").forEach((node, index) => { node.textContent = String(values[index] || 0); });
   document.querySelectorAll("[data-review-tab] span").forEach((node) => {
     const tab = node.parentElement.dataset.reviewTab;

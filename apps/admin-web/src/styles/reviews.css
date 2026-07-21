@@ -1,5 +1,5 @@
 ﻿/* Product-review management module */
-.admin-review-kpis { grid-template-columns:repeat(5, minmax(0, 1fr)); }
+.admin-review-kpis { grid-template-columns:repeat(4, minmax(0, 1fr)); }
 .admin-review-snippet { display:grid; gap:5px; min-width:220px; max-width:320px; }
 .admin-review-snippet__stars { color:#a35f1e; font-size:.8125rem; letter-spacing:.08em; }
 .admin-review-snippet p { display:-webkit-box; overflow:hidden; margin:0; color:var(--text-body); font-size:.875rem; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
