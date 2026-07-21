@@ -101,24 +101,25 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
         kpis[2].querySelector("strong").textContent = fmtNum(data.operations.openSupportTickets);
         kpis[3].querySelector("strong").textContent = fmtNum(data.operations.lowStockProducts);
 
-        kpis[4].querySelector("strong").textContent = fmtNum(data.business.pendingReviews);
-        kpis[4].querySelector("small").textContent = fmtNum(data.operations.urgentReviews) + " đánh giá tiêu cực";
+        kpis[4].querySelector("strong").textContent = fmtNum(data.operations.urgentReviews);
+        kpis[4].querySelector("small").textContent = "Đang hiển thị công khai";
       }
 
       var alertCountBtn = opsPanel.querySelector("[data-dashboard-drawer='alerts']");
       if (alertCountBtn) {
-        var totalAlerts = data.operations.openReturns + data.operations.paymentErrors + data.operations.lowStockProducts + data.operations.openSupportTickets;
-        alertCountBtn.textContent = "Xem tất cả " + totalAlerts;
+        var alertGroupCount = [data.operations.openReturns, data.operations.paymentErrors, data.operations.lowStockProducts, data.operations.openSupportTickets]
+          .filter(function (count) { return Number(count) > 0; }).length;
+        alertCountBtn.textContent = alertGroupCount > 0 ? "Xem " + alertGroupCount + " nhóm cảnh báo" : "Không có cảnh báo";
       }
 
       // Update alerts list on operations panel
       var alertList = opsPanel.querySelector(".dashboard-alert-list");
       if (alertList) {
         alertList.innerHTML = `
-          <article class="dashboard-alert dashboard-alert--critical"><span class="admin-badge admin-badge--danger dashboard-alert__level">Khẩn cấp</span><div><h4>${fmtNum(data.operations.openReturns)} phiếu đổi/trả cần xử lý</h4><p>Đổi trả &amp; CSKH · Tải trực tiếp từ Supabase</p></div><a href="./returns-cskh.html#returns">Xem phiếu</a></article>
+          <article class="dashboard-alert dashboard-alert--high"><span class="admin-badge admin-badge--warning dashboard-alert__level">Cao</span><div><h4>${fmtNum(data.operations.openReturns)} phiếu đổi/trả chờ xử lý</h4><p>Đổi trả &amp; CSKH · Trạng thái Chờ xử lý</p></div><a href="./returns-cskh.html#returns">Xem phiếu</a></article>
           <article class="dashboard-alert dashboard-alert--critical"><span class="admin-badge admin-badge--danger dashboard-alert__level">Khẩn cấp</span><div><h4>${fmtNum(data.operations.paymentErrors)} đơn hàng thanh toán lỗi cần kiểm tra</h4><p>Quản lý đơn hàng · Cảnh báo hệ thống</p></div><a href="./orders.html">Kiểm tra</a></article>
           <article class="dashboard-alert dashboard-alert--high"><span class="admin-badge admin-badge--warning dashboard-alert__level">Cao</span><div><h4>${fmtNum(data.operations.lowStockProducts)} sản phẩm dưới mức tồn kho tối thiểu</h4><p>Sản phẩm &amp; tồn kho · Tồn kho thấp</p></div><a href="./products.html">Xem tồn kho</a></article>
-          <article class="dashboard-alert dashboard-alert--medium"><span class="admin-badge admin-badge--pending dashboard-alert__level">Trung bình</span><div><h4>${fmtNum(data.operations.openSupportTickets)} phiếu hỗ trợ khách hàng chờ phản hồi</h4><p>Đổi trả &amp; CSKH · Phiếu mới nhận</p></div><a href="./returns-cskh.html#support">Xem hỗ trợ</a></article>
+          <article class="dashboard-alert dashboard-alert--medium"><span class="admin-badge admin-badge--pending dashboard-alert__level">Trung bình</span><div><h4>${fmtNum(data.operations.openSupportTickets)} ticket đang xử lý</h4><p>Đổi trả &amp; CSKH · Trạng thái Đang xử lý</p></div><a href="./returns-cskh.html#support">Xem hỗ trợ</a></article>
         `;
       }
 
@@ -131,7 +132,7 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
         var productsStatus = data.operations.lowStockProducts > 0 ? "danger" : "success";
         var productsStatusLabel = productsStatus === "danger" ? "Rủi ro" : "Tốt";
         
-        var reviewsStatus = data.business.pendingReviews > 0 ? "warning" : "success";
+        var reviewsStatus = data.operations.urgentReviews > 0 ? "warning" : "success";
         var reviewsStatusLabel = reviewsStatus === "warning" ? "Cần chú ý" : "Tốt";
         
         var returnsStatus = (data.operations.openReturns > 0 || data.operations.openSupportTickets > 0) ? "warning" : "success";
@@ -169,7 +170,7 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
               <span class="dashboard-health-dot dashboard-health-dot--${reviewsStatus}"></span>
               <strong>Đánh giá</strong>
             </div>
-            <small>${fmtNum(data.business.pendingReviews)} chờ duyệt</small>
+            <small>${fmtNum(data.operations.urgentReviews)} đánh giá tiêu cực đang hiển thị</small>
           </a>
           <a class="dashboard-health-card" href="./returns-cskh.html">
             <div class="dashboard-health-card__head">
@@ -180,29 +181,29 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
               <span class="dashboard-health-dot dashboard-health-dot--${returnsStatus}"></span>
               <strong>Đổi trả &amp; CSKH</strong>
             </div>
-            <small>${fmtNum(data.operations.openReturns)} phiếu còn hạn · ${fmtNum(data.operations.openSupportTickets)} ticket chờ</small>
+            <small>${fmtNum(data.operations.openReturns)} phiếu chờ xử lý · ${fmtNum(data.operations.openSupportTickets)} ticket đang xử lý</small>
           </a>
           <a class="dashboard-health-card" href="./promotions.html">
             <div class="dashboard-health-card__head">
               <i>${icon("tag")}</i>
-              <span class="admin-badge admin-badge--success">Tốt</span>
+              <span class="admin-badge admin-badge--neutral">Thông tin</span>
             </div>
             <div class="dashboard-health-card__title">
-              <span class="dashboard-health-dot dashboard-health-dot--success"></span>
+              <span class="dashboard-health-dot dashboard-health-dot--neutral"></span>
               <strong>Giá &amp; khuyến mãi</strong>
             </div>
-            <small>Hoạt động bình thường</small>
+            <small>Mở phân hệ để xem dữ liệu khuyến mãi</small>
           </a>
           <a class="dashboard-health-card" href="./accounts.html">
             <div class="dashboard-health-card__head">
               <i>${icon("users")}</i>
-              <span class="admin-badge admin-badge--success">Tốt</span>
+              <span class="admin-badge admin-badge--neutral">Thông tin</span>
             </div>
             <div class="dashboard-health-card__title">
-              <span class="dashboard-health-dot dashboard-health-dot--success"></span>
+              <span class="dashboard-health-dot dashboard-health-dot--neutral"></span>
               <strong>Tài khoản &amp; hệ thống</strong>
             </div>
-            <small>Không có cảnh báo bảo mật mới</small>
+            <small>Mở phân hệ để xem trạng thái tài khoản</small>
           </a>
         `;
       }
@@ -212,39 +213,12 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
       var taskCount = opsPanel.querySelector(".dashboard-action-queue .dashboard-section__count");
       if (taskList) {
         var tasks = [
-          {
-            index: "01",
-            title: `Duyệt ${fmtNum(data.operations.openReturns)} phiếu đổi/trả cần xử lý`,
-            desc: "Đổi trả & CSKH · Hạn trong tuần này",
-            badge: "Cao",
-            badgeClass: "admin-badge--danger",
-            link: "./returns-cskh.html#returns"
-          },
-          {
-            index: "02",
-            title: `Kiểm tra ${fmtNum(data.operations.paymentErrors)} đơn thanh toán lỗi`,
-            desc: "Quản lý đơn hàng · Cảnh báo hệ thống",
-            badge: "Cao",
-            badgeClass: "admin-badge--danger",
-            link: "./orders.html"
-          },
-          {
-            index: "03",
-            title: `Phản hồi ${fmtNum(data.operations.urgentReviews)} đánh giá tiêu cực`,
-            desc: "Quản lý đánh giá · Trong hôm nay",
-            badge: "Vừa",
-            badgeClass: "admin-badge--warning",
-            link: "./reviews.html"
-          },
-          {
-            index: "04",
-            title: `Bổ sung tồn kho cho ${fmtNum(data.operations.lowStockProducts)} sản phẩm`,
-            desc: "Quản lý sản phẩm · Tồn kho thấp",
-            badge: "Vừa",
-            badgeClass: "admin-badge--warning",
-            link: "./products.html"
-          }
-        ];
+          { count: data.operations.openReturns, title: `Xử lý ${fmtNum(data.operations.openReturns)} phiếu đổi/trả chờ xử lý`, desc: "Đổi trả & CSKH · Trạng thái Chờ xử lý", badge: "Cao", badgeClass: "admin-badge--danger", link: "./returns-cskh.html#returns" },
+          { count: data.operations.paymentErrors, title: `Kiểm tra ${fmtNum(data.operations.paymentErrors)} đơn thanh toán lỗi`, desc: "Quản lý đơn hàng · Cảnh báo hệ thống", badge: "Cao", badgeClass: "admin-badge--danger", link: "./orders.html" },
+          { count: data.operations.urgentReviews, title: `Phản hồi ${fmtNum(data.operations.urgentReviews)} đánh giá tiêu cực`, desc: "Quản lý đánh giá · Đang hiển thị công khai", badge: "Vừa", badgeClass: "admin-badge--warning", link: "./reviews.html" },
+          { count: data.operations.lowStockProducts, title: `Bổ sung tồn kho cho ${fmtNum(data.operations.lowStockProducts)} sản phẩm`, desc: "Quản lý sản phẩm · Tồn kho thấp", badge: "Vừa", badgeClass: "admin-badge--warning", link: "./products.html" }
+        ].filter(function (task) { return Number(task.count) > 0; });
+        tasks.forEach(function (task, index) { task.index = String(index + 1).padStart(2, "0"); });
         taskList.innerHTML = tasks.map(t => `
           <a href="${t.link}"><span class="dashboard-task__index">${t.index}</span><div><strong>${t.title}</strong><small>${t.desc}</small></div><span class="admin-badge ${t.badgeClass}">${t.badge}</span></a>
         `).join("");
@@ -587,15 +561,14 @@ import { API_BASE_URL, getAccessToken } from "./supabase-auth.js";
       rows.push(toCsvRow(["Chỉ số", "Số lượng", "Trạng thái"]));
       rows.push(toCsvRow(["Đơn hàng cần xử lý", data.operations.pendingOrders, "Cần xử lý"]));
       rows.push(toCsvRow(["Đơn hàng thanh toán lỗi", data.operations.paymentErrors, data.operations.paymentErrors > 0 ? "Khẩn cấp" : "Bình thường"]));
-      rows.push(toCsvRow(["Phiếu đổi/trả cần xử lý", data.operations.openReturns, data.operations.openReturns > 0 ? "Khẩn cấp" : "Bình thường"]));
-      rows.push(toCsvRow(["Phiếu hỗ trợ khách hàng", data.operations.openSupportTickets, data.operations.openSupportTickets > 0 ? "Cần chú ý" : "Bình thường"]));
+      rows.push(toCsvRow(["Phiếu đổi/trả chờ xử lý", data.operations.openReturns, data.operations.openReturns > 0 ? "Khẩn cấp" : "Bình thường"]));
+      rows.push(toCsvRow(["Ticket đang xử lý", data.operations.openSupportTickets, data.operations.openSupportTickets > 0 ? "Cần chú ý" : "Bình thường"]));
       rows.push(toCsvRow(["Sản phẩm sắp hết hàng", data.operations.lowStockProducts, data.operations.lowStockProducts > 0 ? "Khẩn cấp" : "Bình thường"]));
-      rows.push(toCsvRow(["Đánh giá cần duyệt", data.business.pendingReviews, "Bình thường"]));
-      rows.push(toCsvRow(["Đánh giá tiêu cực", data.operations.urgentReviews, data.operations.urgentReviews > 0 ? "Khẩn cấp" : "Bình thường"]));
+      rows.push(toCsvRow(["Đánh giá tiêu cực", data.operations.urgentReviews, data.operations.urgentReviews > 0 ? "Cần chú ý" : "Bình thường"]));
       rows.push("");
       rows.push(toCsvRow(["II. DANH SÁCH CÔNG VIỆC CẦN XỬ LÝ HÔM NAY"]));
       rows.push(toCsvRow(["STT", "Công việc", "Hạn xử lý", "Mức độ ưu tiên"]));
-      rows.push(toCsvRow(["1", "Duyệt " + data.operations.openReturns + " phiếu đổi/trả cần xử lý", "Trong tuần này", "Cao"]));
+      rows.push(toCsvRow(["1", "Xử lý " + data.operations.openReturns + " phiếu đổi/trả chờ xử lý", data.operations.returnsDueSoon + " phiếu sắp chạm SLA 48 giờ", "Cao"]));
       rows.push(toCsvRow(["2", "Kiểm tra " + data.operations.paymentErrors + " đơn thanh toán lỗi", "Cảnh báo hệ thống", "Cao"]));
       rows.push(toCsvRow(["3", "Phản hồi " + data.operations.urgentReviews + " đánh giá tiêu cực", "Trong hôm nay", "Vừa"]));
       rows.push(toCsvRow(["4", "Bổ sung tồn kho cho " + data.operations.lowStockProducts + " sản phẩm", "Tồn kho thấp", "Vừa"]));

@@ -1,8 +1,7 @@
-const ACTIVE_RETURN_STATUSES = new Set(["pending", "approved", "shipping_back", "received"]);
-const ACTIVE_TICKET_STATUSES = new Set(["open", "processing"]);
+const RETURN_WORK_QUEUE_STATUS = "pending";
+const TICKET_IN_PROGRESS_STATUS = "processing";
 const TERMINAL_RETURN_STATUSES = new Set(["completed", "rejected"]);
 const TERMINAL_TICKET_STATUSES = new Set(["resolved", "closed"]);
-const RETURN_PENDING_SLA_MS = 48 * 60 * 60 * 1000;
 
 function vietnamDateKey(value) {
   const date = value instanceof Date ? value : new Date(value);
@@ -17,17 +16,10 @@ function vietnamDateKey(value) {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
-function isActiveReturn(row, now) {
-  if (!ACTIVE_RETURN_STATUSES.has(row?.status)) return false;
-  if (row.status !== "pending") return true;
-  const createdAt = new Date(row.created_at);
-  return !Number.isNaN(createdAt.getTime()) && now.getTime() - createdAt.getTime() <= RETURN_PENDING_SLA_MS;
-}
-
 export function computeServiceKpis({ returns = [], tickets = [], now = new Date() } = {}) {
   const referenceTime = now instanceof Date ? now : new Date(now);
   const today = vietnamDateKey(referenceTime);
-  const activeTickets = tickets.filter((row) => ACTIVE_TICKET_STATUSES.has(row?.status));
+  const processingTickets = tickets.filter((row) => row?.status === TICKET_IN_PROGRESS_STATUS);
 
   const returnsCompletedToday = returns.filter((row) =>
     TERMINAL_RETURN_STATUSES.has(row?.status) && vietnamDateKey(row.resolved_at) === today
@@ -37,9 +29,9 @@ export function computeServiceKpis({ returns = [], tickets = [], now = new Date(
   ).length;
 
   return {
-    returnsInProgress: returns.filter((row) => isActiveReturn(row, referenceTime)).length,
-    ticketsInProgress: activeTickets.length,
-    highPriorityTickets: activeTickets.filter((row) => row.priority === "high").length,
+    returnsInProgress: returns.filter((row) => row?.status === RETURN_WORK_QUEUE_STATUS).length,
+    ticketsInProgress: processingTickets.length,
+    highPriorityTickets: processingTickets.filter((row) => row.priority === "high").length,
     completedToday: returnsCompletedToday + ticketsCompletedToday
   };
 }

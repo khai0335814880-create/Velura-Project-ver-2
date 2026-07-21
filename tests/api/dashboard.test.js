@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { resolveDashboardPeriod } from "../../apps/api/src/dashboard.js";
 
 test("dashboard week is seven complete Vietnam calendar days", () => {
@@ -22,4 +23,16 @@ test("dashboard custom range includes the full ending business day", () => {
 test("dashboard rejects partial and invalid custom ranges", () => {
   assert.throws(() => resolveDashboardPeriod(new URLSearchParams("from=2026-06-21")), /đủ ngày/);
   assert.throws(() => resolveDashboardPeriod(new URLSearchParams("from=2026-02-30&to=2026-03-01")), /không phải ngày hợp lệ/);
+});
+
+
+test("dashboard operational KPIs use exact filter semantics", () => {
+  const sql = readFileSync(new URL("../../database/migrations/018_admin_dashboard_summary.sql", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../apps/admin-web/src/scripts/dashboard.js", import.meta.url), "utf8");
+  assert.match(sql, /return_exchange where status::text = 'pending'/);
+  assert.match(sql, /support_ticket where status::text = 'processing'/);
+  assert.match(sql, /status::text = 'approved' and rating <= 2/);
+  assert.doesNotMatch(ui, /data\.business\.pendingReviews/);
+  assert.doesNotMatch(ui, /Đánh giá cần duyệt|Hạn trong tuần này|Xem tất cả/);
+  assert.match(ui, /nhóm cảnh báo/);
 });

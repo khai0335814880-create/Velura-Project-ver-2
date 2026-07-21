@@ -212,12 +212,17 @@ operations as (
     (select count(*)::integer from public.return_exchange where status::text = 'pending') as open_returns,
     (select count(*)::integer
       from public.return_exchange
-      where status::text = 'pending' and created_at <= (now() at time zone 'Asia/Ho_Chi_Minh') - interval '42 hours'
+      where status::text = 'pending'
+        and created_at >= (now() at time zone 'Asia/Ho_Chi_Minh') - interval '48 hours'
+        and created_at <= (now() at time zone 'Asia/Ho_Chi_Minh') - interval '42 hours'
     ) as returns_due_soon,
-    (select count(*)::integer from public.support_ticket where status::text not in ('resolved', 'closed')) as open_support_tickets,
+    (select count(*)::integer from public.support_ticket where status::text = 'processing') as open_support_tickets,
     (select count(distinct product_id)::integer from public.variant where stock_quantity <= low_stock_threshold) as low_stock_products,
     (select count(*)::integer from public.review where status::text = 'pending') as pending_reviews,
-    (select count(*)::integer from public.review where rating <= 2) as urgent_reviews
+    (select count(*)::integer
+      from public.review
+      where status::text = 'approved' and rating <= 2
+    ) as urgent_reviews
 ),
 daily_series as (
   select generate_series(
