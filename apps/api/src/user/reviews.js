@@ -99,30 +99,13 @@ export async function handleReviewsRoute(req, res, action, parts, corsHeaders, c
       }
     }
 
-    // 1. Save initially as 'pending'
-    const review = await insertRow("review", {
-      product_id,
-      user_id: profile.user_id,
-      order_id,
-      rating,
-      comment: comment || null,
-      images: images || null,
-      review_tags: review_tags || null,
-      status: "pending",
-      submitted_at: new Date().toISOString()
-    });
-
-    console.log(`[AUTO-MODERATION Queue] Đã đưa đánh giá ${review.review_id} vào hàng đợi kiểm duyệt tự động.`);
-
-    // 2. Perform auto-moderation
+    // Moderate before inserting so a review can only persist as approved or hidden.
     const profanities = ["đéo", "chửi", "vãi", "cứt", "mẹ kiếp", "đầu buồi", "dcm", "clm", "địt", "lồn", "buồi", "cặc", "ngu", "chó", "khốn nạn"];
     const adKeywords = ["http://", "https://", "t.me/", "zalo:", "shopee.vn", "lazada.vn", "click vào đây", "nhận quà miễn phí", "quà tặng miễn phí", "mua ngay", "giảm giá sốc"];
-
     let finalStatus = "approved";
     let rejectionReason = null;
     const lowerComment = (comment || "").toLowerCase();
 
-    // Check profanities
     for (const word of profanities) {
       if (lowerComment.includes(word)) {
         finalStatus = "rejected";
@@ -130,8 +113,6 @@ export async function handleReviewsRoute(req, res, action, parts, corsHeaders, c
         break;
       }
     }
-
-    // Check ads/spam
     if (finalStatus === "approved") {
       for (const ad of adKeywords) {
         if (lowerComment.includes(ad)) {
@@ -141,8 +122,6 @@ export async function handleReviewsRoute(req, res, action, parts, corsHeaders, c
         }
       }
     }
-
-    // Check image validity
     if (finalStatus === "approved" && Array.isArray(images)) {
       for (const img of images) {
         const lowerImg = img.toLowerCase();
@@ -154,18 +133,19 @@ export async function handleReviewsRoute(req, res, action, parts, corsHeaders, c
       }
     }
 
-    // 3. Update database row with auto-moderation result
-    const updatedRows = await updateRows(
-      "review",
-      { review_id: `eq.${review.review_id}` },
-      {
-        status: finalStatus,
-        rejection_reason: rejectionReason,
-        moderated_at: new Date().toISOString()
-      }
-    );
-
-    const finalReview = updatedRows[0] || review;
+    const finalReview = await insertRow("review", {
+      product_id,
+      user_id: profile.user_id,
+      order_id,
+      rating,
+      comment: comment || null,
+      images: images || null,
+      review_tags: review_tags || null,
+      status: finalStatus,
+      rejection_reason: rejectionReason,
+      moderated_at: new Date().toISOString(),
+      submitted_at: new Date().toISOString()
+    });
 
     // Send moderation notification
     if (finalStatus === "approved") {

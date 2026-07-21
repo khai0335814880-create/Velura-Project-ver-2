@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createReviewService } from "../../apps/api/src/reviews/review-service.js";
 
 const REVIEW_ID = "40000000-0000-4000-8000-000000000001";
@@ -24,3 +25,14 @@ test("unrelated role cannot read reviews and hide requires a reason", async () =
 });
 
 function context(roleCode) { return { authUser: { id: "auth-1" }, roleCode, accessToken: "jwt-token" }; }
+
+
+test("review workflow persists only approved or hidden states", () => {
+  const userFlow = readFileSync(new URL("../../apps/api/src/user/reviews.js", import.meta.url), "utf8");
+  const adminUi = readFileSync(new URL("../../apps/admin-web/src/scripts/reviews.js", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../../database/migrations/20260721133000_review_two_state_workflow.sql", import.meta.url), "utf8");
+  assert.doesNotMatch(userFlow, /status: "pending"|AUTO-MODERATION Queue/);
+  assert.match(userFlow, /status: finalStatus/);
+  assert.doesNotMatch(adminUi, /Chờ duyệt|Cần xử lý gấp|Đã xử lý|value="pending"/);
+  assert.ok(migration.includes("status::text in ('approved', 'rejected')"));
+});

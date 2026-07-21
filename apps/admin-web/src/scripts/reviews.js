@@ -4,7 +4,7 @@ import { reviewApi } from "./review-api.js";
 const state = { rows: [], count: 0, active: "all", selected: null, currentPage: 1, itemsPerPage: 10, logs: [], logsPage: 1 };
 const panel = document.querySelector("#review-panel");
 const overlay = document.querySelector("#review-overlay");
-const statusLabels = { pending: "Chờ duyệt", approved: "Đã duyệt", rejected: "Đã ẩn" };
+const statusLabels = { approved: "Đã duyệt", rejected: "Đã ẩn" };
 
 export function escapeReviewHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
@@ -31,9 +31,8 @@ function statusBadge(status) {
 }
 
 function filteredRows() {
-  if (state.active === "pending") return state.rows.filter((row) => row.status === "pending" && !row.is_flagged_urgent);
-  if (state.active === "urgent") return state.rows.filter((row) => row.is_flagged_urgent || Number(row.rating) <= 2);
-  if (state.active === "processed") return state.rows.filter((row) => row.status !== "pending" || row.admin_reply);
+  if (state.active === "approved") return state.rows.filter((row) => row.status === "approved");
+  if (state.active === "rejected") return state.rows.filter((row) => row.status === "rejected");
   return state.rows;
 }
 
@@ -41,7 +40,7 @@ function filters() {
   return `<form class="admin-filter-bar admin-order-filter-bar" data-review-filter>
     <label class="admin-search-field">${icon("search")}<input class="admin-form-control" name="q" type="search" placeholder="Nội dung hoặc sản phẩm..." data-review-search /></label>
     <label class="admin-form-group"><select class="admin-form-control" name="rating" data-review-stars aria-label="Số sao"><option value="">Tất cả số sao</option>${[5,4,3,2,1].map((value) => `<option value="${value}">${value} sao</option>`).join("")}</select></label>
-    <label class="admin-form-group"><select class="admin-form-control" name="status" data-review-status aria-label="Trạng thái"><option value="">Tất cả trạng thái</option><option value="pending">Chờ duyệt</option><option value="approved">Đã duyệt</option><option value="rejected">Đã ẩn</option></select></label>
+    <label class="admin-form-group"><select class="admin-form-control" name="status" data-review-status aria-label="Trạng thái"><option value="">Tất cả trạng thái</option><option value="approved">Đã duyệt</option><option value="rejected">Đã ẩn</option></select></label>
     <div class="admin-filter-bar__actions"><button class="admin-btn admin-btn--filter admin-btn--sm" type="submit">Lọc</button><button class="admin-btn admin-btn--ghost admin-btn--sm" type="reset">Đặt lại</button></div>
   </form>`;
 }
@@ -108,11 +107,13 @@ function table() {
 }
 
 function updateKpis() {
-  const values = [state.count, state.rows.filter((r) => r.status === "pending").length, state.rows.filter((r) => r.is_flagged_urgent || Number(r.rating) <= 2).length, state.rows.filter((r) => r.status === "rejected").length, state.rows.filter((r) => r.is_flagged_urgent).length];
+  const approvedCount = state.rows.filter((row) => row.status === "approved").length;
+  const hiddenCount = state.rows.filter((row) => row.status === "rejected").length;
+  const values = [state.count, approvedCount, hiddenCount];
   document.querySelectorAll(".admin-review-kpis .admin-kpi-card__value").forEach((node, index) => { node.textContent = String(values[index] || 0); });
   document.querySelectorAll("[data-review-tab] span").forEach((node) => {
     const tab = node.parentElement.dataset.reviewTab;
-    node.textContent = String(tab === "all" ? state.count : tab === "pending" ? values[1] : tab === "urgent" ? values[2] : state.rows.filter((r) => r.status !== "pending").length);
+    node.textContent = String(tab === "all" ? state.count : tab === "approved" ? approvedCount : hiddenCount);
   });
 }
 
