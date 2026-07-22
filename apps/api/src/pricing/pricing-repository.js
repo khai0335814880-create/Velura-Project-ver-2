@@ -83,17 +83,17 @@ export function createPricingRepository() {
     },
 
     async activatePromotion(promotionId, input, accessToken) {
-      return callRpc("admin_activate_promotion", {
+      return withPricingError(() => callRpc("admin_activate_promotion", {
         p_promo_id: promotionId,
         p_expected_version: input.expectedVersion
-      }, { accessToken });
+      }, { accessToken }));
     },
 
     async pausePromotion(promotionId, input, accessToken) {
-      return callRpc("admin_pause_promotion", {
+      return withPricingError(() => callRpc("admin_pause_promotion", {
         p_promo_id: promotionId,
         p_expected_version: input.expectedVersion
-      }, { accessToken });
+      }, { accessToken }));
     },
 
     async listVouchers(filters, accessToken) {
@@ -225,7 +225,9 @@ function pricingErrorMessage(code) {
     PRICE_REQUIRED: "Base price and sale price are required",
     PRICE_NON_NEGATIVE: "Prices must be non-negative",
     SALE_PRICE_ABOVE_BASE_PRICE: "Sale price cannot be higher than base price",
-    REASON_MIN_10_CHARS: "Reason must be at least 10 characters"
+    REASON_MIN_10_CHARS: "Reason must be at least 10 characters",
+    OUTSIDE_DATE_RANGE: "Campaign can only be activated between its start and end dates",
+    PROMOTION_NOT_FOUND: "Promotion was not found"
   };
   return messages[code] || "Pricing database operation failed";
 }

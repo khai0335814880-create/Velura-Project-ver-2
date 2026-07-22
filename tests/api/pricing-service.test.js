@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { createPricingService, validatePriceChange } from "../../apps/api/src/pricing/pricing-service.js";
+import { getCampaignLifecycle } from "../../apps/admin-web/src/scripts/promotion-status.js";
 
 const PRODUCT_ID = "60000000-0000-4000-8000-000000000001";
 
@@ -47,6 +48,19 @@ test("A06 base and sale price migration records full price history", async () =>
 test("unrelated role cannot read pricing audit logs", async () => {
   const service = createPricingService({ repository: { listAuditLogs: async () => ({}) } });
   await assert.rejects(() => service.listAuditLogs(context("admin_operator_cskh_dt"), new URLSearchParams()), (error) => error.status === 403);
+});
+
+test("campaign lifecycle only allows toggling during its date range", () => {
+  const now = new Date("2026-07-22T12:00:00Z");
+  const base = { start_date: "2026-07-20T00:00:00Z", end_date: "2026-07-30T23:59:59Z" };
+  assert.deepEqual(getCampaignLifecycle({ ...base, is_active: true }, now).code, "running");
+  assert.deepEqual(getCampaignLifecycle({ ...base, is_active: false }, now).code, "paused");
+  assert.equal(getCampaignLifecycle({ ...base, is_active: false }, now).canToggle, true);
+  assert.equal(getCampaignLifecycle({ ...base, start_date: "2026-07-23T00:00:00Z" }, now).code, "scheduled");
+  assert.equal(getCampaignLifecycle({ ...base, end_date: "2026-07-21T23:59:59Z" }, now).code, "expired");
+  assert.equal(getCampaignLifecycle({ ...base, end_date: "invalid" }, now).code, "invalid");
+  assert.equal(getCampaignLifecycle({ ...base, start_date: "2026-07-23T00:00:00Z" }, now).canToggle, false);
+  assert.equal(getCampaignLifecycle({ ...base, end_date: "2026-07-21T23:59:59Z" }, now).canToggle, false);
 });
 
 function context(roleCode) { return { authUser: { id: "auth-1" }, roleCode, accessToken: "jwt-token" }; }

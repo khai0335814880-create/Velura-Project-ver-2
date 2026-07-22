@@ -1,6 +1,9 @@
 import adminIconsUrl from "../assets/icons/admin-icons.svg?url";
 import { pricingApi } from "./pricing-api.js";
 import { productApi } from "./product-api.js";
+import { getCampaignLifecycle } from "./promotion-status.js";
+
+export { getCampaignLifecycle } from "./promotion-status.js";
 
 const state = { view: "campaigns", promotions: [], vouchers: [], bundles: [], logs: [], stats: null, comboPage: 1, comboPerPage: 10, comboItems: {}, allProducts: [], categories: [], logsPage: 1, logsPerPage: 10 };
 const panel = document.querySelector("#promo-panel");
@@ -14,6 +17,9 @@ function icon(name) { return `<svg class="admin-line-icon"><use href="${adminIco
 function money(value) { return Number(value || 0).toLocaleString("vi-VN") + "đ"; }
 function date(value) { if (!value) return "-"; const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? "-" : new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).format(parsed); }
 function badge(active) { return `<span class="admin-badge admin-badge--${active ? "success" : "warning"}">${active ? "Đang hoạt động" : "Tạm dừng"}</span>`; }
+function campaignBadge(lifecycle) {
+  return `<span class="admin-badge admin-badge--${lifecycle.badge}">${lifecycle.label}</span>`;
+}
 function progressBar(used, total) {
   const pct = total > 0 ? Math.min(Math.round(used * 100 / total), 100) : 0;
   return `<div class="admin-progress admin-progress--wide"><span style="width:${pct}%;background:${pct > 80 ? "var(--error)" : pct > 50 ? "var(--warning,#e67e22)" : "var(--terracotta)"}"></span></div><small class="admin-order-subtext">${pct}% đã sử dụng</small>`;
@@ -48,11 +54,13 @@ function renderPagination(totalItems, currentPage, perPage, dataAttr) {
 }
 
 function updateKpis() {
-  const activePromotions = state.promotions.filter((row) => row.is_active).length;
+  const lifecycles = state.promotions.map((row) => getCampaignLifecycle(row));
+  const activePromotions = lifecycles.filter((item) => item.code === "running").length;
   const activeVouchers = state.vouchers.filter((row) => row.is_active).length;
   const issued = state.promotions.reduce((sum, row) => sum + Number(row.total_discount_issued || 0), 0);
   const budget = state.promotions.reduce((sum, row) => sum + Number(row.budget_limit || 0), 0);
-  const values = [["Chiến dịch đang chạy", activePromotions], ["Voucher hoạt động", activeVouchers], ["Giảm giá đã phát hành", money(issued)], ["Tổng ngân sách", money(budget)], ["Cần xử lý", state.promotions.length - activePromotions]];
+  const needsAttention = lifecycles.filter((item) => item.code === "paused" || item.code === "invalid").length;
+  const values = [["Chiến dịch đang chạy", activePromotions], ["Voucher hoạt động", activeVouchers], ["Giảm giá đã phát hành", money(issued)], ["Tổng ngân sách", money(budget)], ["Cần xử lý", needsAttention]];
   document.querySelector("#promo-kpis").innerHTML = values.map(([label, value]) => `<article class="admin-kpi-card"><div class="admin-kpi-card__head"><p class="admin-kpi-card__label">${label}</p><span class="admin-kpi-card__icon">${icon("tag")}</span></div><strong class="admin-kpi-card__value">${value}</strong></article>`).join("");
   document.querySelectorAll("[data-promo-view] span").forEach((node) => { const view = node.parentElement.dataset.promoView; node.textContent = String(view === "campaigns" ? state.promotions.length : view === "vouchers" ? state.vouchers.length : view === "bundles" ? state.bundles.length : view === "stats" ? "📊" : state.logs.length); });
 }
@@ -61,7 +69,11 @@ function campaignRows() {
   return state.promotions.map((row) => {
     const budgetUsed = Number(row.total_discount_issued || 0);
     const budgetTotal = Number(row.budget_limit || 0);
-    return `<tr><td><strong>${escapePromotionHtml(row.promo_name)}</strong><small class="admin-order-subtext">${escapePromotionHtml(row.promo_id)}</small></td><td>${escapePromotionHtml(row.promo_type === "flash_sale" ? "Flash Sale" : row.promo_type === "combo_discount" ? "Giảm giá Combo" : row.promo_type === "product_discount" ? "Giảm giá sản phẩm" : row.promo_type === "seasonal_sale" ? "Giảm giá theo mùa" : row.promo_type)}</td><td>${date(row.start_date)} - ${date(row.end_date)}</td><td><div>${money(budgetUsed)} / ${money(budgetTotal)}</div>${budgetTotal > 0 ? progressBar(budgetUsed, budgetTotal) : ""}</td><td>${badge(row.is_active)}</td><td><div class="admin-table-actions"><button class="admin-icon-button admin-icon-button--sm" data-promo-detail="promotion:${escapePromotionHtml(row.promo_id)}" title="Chi tiết">${icon("eye")}</button><button class="admin-icon-button admin-icon-button--sm" data-promo-edit="promotion:${escapePromotionHtml(row.promo_id)}" title="Chỉnh sửa">${icon("edit")}</button><button class="admin-icon-button admin-icon-button--sm" data-promo-toggle="${escapePromotionHtml(row.promo_id)}" title="Đổi trạng thái">${icon("refresh")}</button></div></td></tr>`;
+    const lifecycle = getCampaignLifecycle(row);
+    const toggle = lifecycle.canToggle
+      ? `<button class="admin-icon-button admin-icon-button--sm" data-promo-toggle="${escapePromotionHtml(row.promo_id)}" title="${lifecycle.toggleTitle}">${icon("refresh")}</button>`
+      : `<button class="admin-icon-button admin-icon-button--sm" type="button" disabled title="${lifecycle.toggleTitle}" aria-label="${lifecycle.toggleTitle}">${icon("refresh")}</button>`;
+    return `<tr><td><strong>${escapePromotionHtml(row.promo_name)}</strong><small class="admin-order-subtext">${escapePromotionHtml(row.promo_id)}</small></td><td>${escapePromotionHtml(row.promo_type === "flash_sale" ? "Flash Sale" : row.promo_type === "combo_discount" ? "Giảm giá Combo" : row.promo_type === "product_discount" ? "Giảm giá sản phẩm" : row.promo_type === "seasonal_sale" ? "Giảm giá theo mùa" : row.promo_type)}</td><td>${date(row.start_date)} - ${date(row.end_date)}</td><td><div>${money(budgetUsed)} / ${money(budgetTotal)}</div>${budgetTotal > 0 ? progressBar(budgetUsed, budgetTotal) : ""}</td><td>${campaignBadge(lifecycle)}</td><td><div class="admin-table-actions"><button class="admin-icon-button admin-icon-button--sm" data-promo-detail="promotion:${escapePromotionHtml(row.promo_id)}" title="Chi tiết">${icon("eye")}</button><button class="admin-icon-button admin-icon-button--sm" data-promo-edit="promotion:${escapePromotionHtml(row.promo_id)}" title="Chỉnh sửa">${icon("edit")}</button>${toggle}</div></td></tr>`;
   }).join("");
 }
 
@@ -493,11 +505,24 @@ document.addEventListener("click", async (event) => {
   if (toggle) {
     const row = state.promotions.find((item) => item.promo_id === toggle.dataset.promoToggle);
     if (!row) return;
+    const lifecycle = getCampaignLifecycle(row);
+    if (!lifecycle.canToggle) {
+      showToast(lifecycle.toggleTitle, "error");
+      return;
+    }
     try {
       await (row.is_active ? pricingApi.pausePromotion(row.promo_id, { expectedVersion: row.version }) : pricingApi.activatePromotion(row.promo_id, { expectedVersion: row.version }));
       showToast(row.is_active ? "Đã tạm dừng chiến dịch" : "Đã kích hoạt chiến dịch", "success");
       await load();
-    } catch (error) { showToast(error.message || "Không thể đổi trạng thái", "error"); }
+    } catch (error) {
+      const message = error.code === "OUTSIDE_DATE_RANGE"
+        ? "Không thể kích hoạt: chiến dịch chưa bắt đầu hoặc đã kết thúc. Hãy chỉnh sửa thời gian chiến dịch."
+        : error.code === "VERSION_CONFLICT"
+          ? "Chiến dịch vừa được cập nhật ở nơi khác. Dữ liệu đang được tải lại."
+          : error.message || "Không thể đổi trạng thái chiến dịch";
+      showToast(message, "error");
+      await load();
+    }
   }
 
   const voucherToggle = event.target.closest("[data-voucher-toggle]");
