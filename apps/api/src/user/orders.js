@@ -3,8 +3,17 @@ import { selectOne, selectRows, insertRow, updateRows } from "../supabase.js";
 import { hashPassword, signJwt } from "../auth-helper.js";
 import { requireUserAuth, validatePhone } from "./auth.js";
 import { createNotification } from "./notifications.js";
+import { randomUUID } from "node:crypto";
 
 const checkoutOtpAttemptsMap = new Map();
+
+export function buildFailedDeliverySupportTicket(order, profile, ticketId = randomUUID(), createdAt = new Date().toISOString()) {
+  if (!order) throw new HttpError(404, "NOT_FOUND", "Không tìm thấy đơn hàng");
+  if (!profile || order.user_id !== profile.user_id) throw new HttpError(403, "FORBIDDEN", "Bạn không có quyền yêu cầu hỗ trợ cho đơn hàng này");
+  if (order.status !== "failed_delivery") throw new HttpError(422, "ORDER_NOT_FAILED_DELIVERY", "Chỉ có thể tạo phiếu hỗ trợ giao hàng cho đơn giao thất bại");
+  const orderCode = order.tracking_code || order.order_id;
+  return { ticket_id: ticketId, user_id: profile.user_id, guest_phone: null, guest_email: null, source_order_id: order.order_id, title: `Hỗ trợ giao hàng thất bại - Đơn ${orderCode}`, description: `Khách hàng yêu cầu CSKH hỗ trợ đơn giao thất bại. Mã đơn hàng: ${order.order_id}. Mã vận đơn: ${orderCode}.`, priority: "high", status: "open", admin_reply: null, created_at: createdAt, resolved_at: null };
+}
 
 import { config } from "../config.js";
 
@@ -266,6 +275,15 @@ export async function handleOrdersRoute(req, res, subRoute, action, parts, corsH
   }
 
   if (subRoute === "orders") {
+    if (req.method === "POST" && action && parts[4] === "support-ticket") {
+      const profile = requireUserAuth(context);
+      const order = await selectOne("orders", { order_id: `eq.${action}` });
+      const ticketPayload = buildFailedDeliverySupportTicket(order, profile);
+      const { rows: activeTickets } = await selectRows("support_ticket", { user_id: `eq.${profile.user_id}`, source_order_id: `eq.${order.order_id}`, status: "in.(open,processing)", order: "created_at.desc", limit: 1 });
+      if (activeTickets[0]) return sendJson(res, 200, { success: true, created: false, ticket: activeTickets[0] }, corsHeaders);
+      const ticket = await insertRow("support_ticket", ticketPayload);
+      return sendJson(res, 201, { success: true, created: true, ticket }, corsHeaders);
+    }
     if (req.method === "GET") {
       let profile = null;
       try {

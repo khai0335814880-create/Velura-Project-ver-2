@@ -524,14 +524,28 @@ export function initOrderDetail() {
       }
     }
 
-    const supportBtn = document.createElement("button");
-    supportBtn.type = "button";
-    supportBtn.className = "detail-action-btn detail-action-btn--support";
-    supportBtn.textContent = "Liên hệ hỗ trợ";
-    supportBtn.addEventListener("click", () => {
-      showToast("Cảm ơn bạn. Bộ phận CSKH Velura sẽ liên hệ với bạn qua số điện thoại đăng ký.");
-    });
-    groupEl.appendChild(supportBtn);
+    if (order.status === "failed_delivery") {
+      const supportBtn = document.createElement("button");
+      supportBtn.type = "button";
+      supportBtn.className = "detail-action-btn detail-action-btn--support";
+      supportBtn.textContent = "Liên hệ hỗ trợ";
+      supportBtn.addEventListener("click", async () => {
+        if (supportBtn.disabled) return;
+        supportBtn.disabled = true;
+        supportBtn.textContent = "Đang tạo phiếu...";
+        try {
+          const result = await apiRequest(`/api/user/orders/${encodeURIComponent(order.order_id)}/support-ticket`, { method: "POST" });
+          const shortCode = result.ticket?.ticket_id?.slice(0, 8) || "";
+          supportBtn.textContent = "Đã gửi hỗ trợ";
+          showToast(result.created ? `Đã tạo phiếu hỗ trợ #${shortCode}. Bộ phận CSKH sẽ sớm liên hệ với bạn.` : `Phiếu hỗ trợ #${shortCode} của đơn hàng này đang được xử lý.`);
+        } catch (err) {
+          supportBtn.disabled = false;
+          supportBtn.textContent = "Liên hệ hỗ trợ";
+          showToast(`Không thể tạo phiếu hỗ trợ: ${err.message}`);
+        }
+      });
+      groupEl.appendChild(supportBtn);
+    }
 
     actionCardEl.appendChild(groupEl);
   }

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: localhost:5000/velura-api:prod-20260721-7
+          image: localhost:5000/velura-api:prod-20260722-10
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef: { name: velura-api-config }

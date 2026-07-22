@@ -54,6 +54,7 @@ const MIGRATIONS = [
   '020_user_social_accounts.sql',
   '20260717090000_ensure_user_social_accounts_schema_cache.sql',
   '20260722120000_reenable_product_rls.sql',
+  '20260722143000_failed_delivery_support_ticket.sql',
 ];
 
 async function main() {

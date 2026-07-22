@@ -39,5 +39,5 @@ export const RETURN_SELECT = [
 export const TICKET_SELECT = [
   "ticket_id", "user_id", "guest_phone", "guest_email", "title",
   "description", "priority", "status", "admin_reply", "csat_score",
-  "created_at", "resolved_at", "version"
+  "source_order_id", "created_at", "resolved_at", "version"
 ].join(",");

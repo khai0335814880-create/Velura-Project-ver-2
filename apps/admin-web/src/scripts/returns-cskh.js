@@ -216,7 +216,7 @@ function renderTickets(rows = state.tickets) {
   body.innerHTML = pagedRows.length ? pagedRows.map((row) => `<tr>
     <td><strong>${escapeServiceHtml(row.ticket_id)}</strong><small class="admin-order-subtext">${escapeServiceHtml(formatDate(row.created_at))}</small></td>
     <td>${escapeServiceHtml(row.user_id || row.guest_email || row.guest_phone || "Khách")}</td>
-    <td>${escapeServiceHtml(row.title)}</td>
+    <td>${escapeServiceHtml(row.title)}${row.source_order_id ? `<small class="admin-order-subtext">Đơn: ${escapeServiceHtml(row.source_order_id)}</small>` : ""}</td>
     <td>${escapeServiceHtml(row.description)}</td>
     <td>${badge(row.status)}</td>
     <td><div class="admin-table-actions">
@@ -305,6 +305,7 @@ function detail(type, id) {
         <h3 class="admin-drawer__section">Thông tin hỗ trợ</h3>
         <dl class="admin-data-list">
           <div><dt>Tiêu đề</dt><dd><strong>${escapeServiceHtml(row.title)}</strong></dd></div>
+          ${row.source_order_id ? `<div><dt>Mã đơn hàng nguồn</dt><dd><strong>${escapeServiceHtml(row.source_order_id)}</strong></dd></div>` : ""}
           <div><dt>Khách hàng</dt><dd>${escapeServiceHtml(row.user_id || row.guest_email || row.guest_phone || "Khách")}</dd></div>
           <div><dt>Độ ưu tiên</dt><dd><span class="admin-badge admin-badge--priority-${row.priority}">${escapeServiceHtml(row.priority === "high" ? "Cao" : row.priority === "normal" ? "Trung bình" : "Thấp")}</span></dd></div>
           <div><dt>Trạng thái</dt><dd>${badge(row.status)}</dd></div>
