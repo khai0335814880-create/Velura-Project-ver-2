@@ -80,6 +80,14 @@ test("A01-A06 hardening migration restores RLS and removes anonymous RPC executi
   assert.match(migration, /revoke all on public\.review, public\.return_exchange/);
 });
 
+test("product RLS recovery keeps hidden CSV imports out of the public catalog", async () => {
+  const migration = await readFile(new URL("../../database/migrations/20260722120000_reenable_product_rls.sql", import.meta.url), "utf8");
+  assert.match(migration, /alter table public\.product enable row level security/i);
+  assert.match(migration, /revoke insert, update, delete, truncate, references, trigger\s+on table public\.product from anon, authenticated/i);
+  assert.match(migration, /create policy product_public_select[\s\S]*to anon[\s\S]*status = 'on_sale'/i);
+  assert.match(migration, /create policy product_admin_select[\s\S]*velura_has_admin_role/i);
+});
+
 test("admin repositories propagate the caller JWT instead of bypassing RLS", async () => {
   const paths = [
     "../../apps/api/src/accounts/account-repository.js",

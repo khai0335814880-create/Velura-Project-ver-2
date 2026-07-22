@@ -1,0 +1,3 @@
+﻿sku,name,base_price,category_id,description,sale_price,status,is_featured
+VLR-CSVTEST-01,"Sản phẩm CSV kiểm thử, Áo",250000,8fee0728-1d9e-498a-a048-9b8366ac0184,Sản phẩm ẩn dùng kiểm thử nhập hàng loạt,220000,hidden,false
+VLR-CSVTEST-02,Sản phẩm CSV kiểm thử Quần,320000,ce1a6336-4ada-4a57-9106-5f651e1bcdc9,Sản phẩm ẩn dùng kiểm thử cập nhật hàng loạt,295000,hidden,false
