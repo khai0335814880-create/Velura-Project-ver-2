@@ -1,0 +1,6 @@
+﻿sku,name,base_price,category_id,description,sale_price,status,is_featured
+VLR-DEMO-PK01,Túi xách mini khóa kim loại,849000,7058b468-c7e9-4c26-b31e-6546bd9fd3ac,Túi mini phom hộp với quai đeo có thể điều chỉnh,779000,hidden,true
+VLR-DEMO-PK02,Khăn lụa họa tiết hoa cổ điển,329000,7058b468-c7e9-4c26-b31e-6546bd9fd3ac,Khăn lụa mềm dùng quàng cổ hoặc trang trí túi xách,299000,hidden,false
+VLR-DEMO-PK03,Thắt lưng da bản nhỏ màu nâu,459000,7058b468-c7e9-4c26-b31e-6546bd9fd3ac,Thắt lưng bản nhỏ tạo điểm nhấn cho đầm và quần cạp cao,419000,hidden,false
+VLR-DEMO-PK04,Bông tai ngọc trai dáng dài,389000,7058b468-c7e9-4c26-b31e-6546bd9fd3ac,Bông tai dáng dài thanh lịch phù hợp trang phục dự tiệc,349000,hidden,true
+VLR-DEMO-PK05,Mũ beret dạ phong cách Pháp,419000,7058b468-c7e9-4c26-b31e-6546bd9fd3ac,Mũ beret dạ mềm hoàn thiện phong cách mùa thu đông,379000,hidden,false

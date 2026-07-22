@@ -1,0 +1,6 @@
+﻿sku,name,base_price,category_id,description,sale_price,status,is_featured
+VLR-DEMO-AO01,Áo sơ mi lụa cổ nơ thanh lịch,689000,8fee0728-1d9e-498a-a048-9b8366ac0184,Áo sơ mi lụa mềm nhẹ phù hợp công sở và sự kiện,629000,hidden,false
+VLR-DEMO-QN01,Quần ống suông cạp cao màu kem,759000,ce1a6336-4ada-4a57-9106-5f651e1bcdc9,Quần ống suông tôn dáng với chất liệu đứng phom,699000,hidden,false
+VLR-DEMO-DV01,Đầm midi cổ vuông tay phồng,989000,a60448c6-3363-43c4-8310-239cf810204b,Đầm midi nữ tính dùng cho tiệc nhẹ và dạo phố,899000,hidden,true
+VLR-DEMO-AK01,Áo khoác blazer dáng rộng,1250000,21d95344-84e7-42ca-a228-510d700e73e1,Blazer dáng rộng hiện đại dễ phối cùng váy hoặc quần,1150000,hidden,false
+VLR-DEMO-SD01,Set áo gile và chân váy xếp ly,1390000,e752a54d-6aa6-4174-aaaa-521b6f6f009a,Bộ phối sẵn phong cách thanh lịch dành cho ngày đi làm,1290000,hidden,true
