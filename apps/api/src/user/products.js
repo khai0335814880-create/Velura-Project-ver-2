@@ -86,8 +86,9 @@ export async function handleProductsRoute(req, res, subRoute, action, corsHeader
         if (dbReviews && dbReviews.length > 0) {
           const userIds = [...new Set(dbReviews.map(r => r.user_id))];
           const { rows: reviewUsers } = await selectRows("users", {
-            user_id: `in.(${userIds.join(",")})`
-          }, { useAnonKey: true });
+            user_id: `in.(${userIds.join(",")})`,
+            select: "user_id,full_name"
+          });
           const userMap = new Map(reviewUsers.map(u => [u.user_id, u.full_name]));
           reviews = dbReviews.map(r => ({
             ...r,
